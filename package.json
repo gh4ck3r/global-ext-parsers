@@ -1,0 +1,32 @@
+{
+  "name": "global-ext-parsers",
+  "version": "1.0.0",
+  "description": "External parser for customized GNU global source tagging system",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gh4ck3r/global-ext-parsers.git"
+  },
+  "keywords": [
+    "GNU",
+    "global",
+    "gtags",
+    "cscope",
+    "cgtas",
+    "exuberant",
+    "parser",
+    "JavaScript"
+  ],
+  "author": "Changbin Park",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gh4ck3r/global-ext-parsers/issues"
+  },
+  "homepage": "https://github.com/gh4ck3r/global-ext-parsers#readme",
+  "dependencies": {
+    "esprima": "^3.1.3"
+  }
+}
