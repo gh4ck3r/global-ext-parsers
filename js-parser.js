@@ -54,6 +54,10 @@ function exitWithError(aError) {
   process.exit(aError.errno);
 }
 
+const DEF = 'D';
+const REF = 'R';
+const UNKNOWN = 'U';
+
 function getASTParser(aFile) {
   let sources;
   return function (aParseInfo) {
@@ -72,9 +76,9 @@ function getASTParser(aFile) {
                              aParent[prop] === aAST);
 
       const idType = getIdType(aParent.type, prop, aAST);
-      if (idType === 'D' || idType === 'R')
+      if (idType === DEF || idType === REF)
         console.log(`${idType},${name},${aFile},${line}:${column+1},${sources[line-1]}`);
-      else if (idType === 'U') {
+      else if (idType === UNKNOWN) {
         console.error('\x1b[31;1m');  // ANSI code red
         console.error(`Unknown Identifier : ${name} at ${aFile} ${line}:${column+1},${sources[line-1]}`);
         console.error(`  aParentType : ${aParent.type}.${prop}`);
@@ -103,8 +107,40 @@ function dump(aObj) {
 
 const getIdType = (aParentType, aIdProp, aAST) => {
   const {type, name, loc: {start: {line, column}}} = aAST;
-  switch(aParentType) {
-    default:
-      return 'U';
+  switch(`${aParentType}.${aIdProp}`) {
+    // Definition
+    case "CallExpression.callee":
+    case "FunctionDeclaration.id":
+    case "VariableDeclarator.id":
+      return DEF;
+
+    // References
+    case "BinaryExpression.left":
+    case "BinaryExpression.right":
+    case "CallExpression.arguments":
+    case "ForInStatement.right":
+    case "IfStatement.test":
+    case "MemberExpression.object":
+    case "MemberExpression.property":
+    case "NewExpression.callee":
+    case "Property.value":
+    case "ReturnStatement.argument":
+    case "TemplateLiteral.expressions":
+    case "VariableDeclarator.init":
+      return REF;
+
+    // Ignored symbols
+    case "ArrowFunctionExpression.params":  // Locally defined
+    case "AssignmentExpression.left":       // This is just assignment
+    case "AssignmentPattern.left":
+    case "CatchClause.param":
+    case "FunctionExpression.params":       // Locally defined
+      return;
+
+    // Possibly verbose definition from here
+    case "FunctionDeclaration.params":
+    case "Property.key":
+      return DEF;
   }
+  return UNKNOWN;
 };
