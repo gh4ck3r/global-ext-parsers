@@ -4,7 +4,7 @@
   "description": "External parser for customized GNU global source tagging system",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "for sample in test/*.js;do if [ \"$(js-parser.js $sample)\" != \"$(cat $sample.expect)\" ];then echo Error on $sample;exit 1;fi; done;"
   },
   "repository": {
     "type": "git",
