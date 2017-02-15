@@ -1,0 +1,2 @@
+D,prop,test/016.ForInStatement.js,2:10,for (let prop in aAST);
+R,aAST,test/016.ForInStatement.js,2:18,for (let prop in aAST);

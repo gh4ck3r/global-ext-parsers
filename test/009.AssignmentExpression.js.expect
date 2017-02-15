@@ -1,0 +1,5 @@
+D,ast,test/009.AssignmentExpression.js,2:5,let ast;
+R,esprima,test/009.AssignmentExpression.js,3:7,ast = esprima.parse(aSourceCode, option);
+R,parse,test/009.AssignmentExpression.js,3:15,ast = esprima.parse(aSourceCode, option);
+R,aSourceCode,test/009.AssignmentExpression.js,3:21,ast = esprima.parse(aSourceCode, option);
+R,option,test/009.AssignmentExpression.js,3:34,ast = esprima.parse(aSourceCode, option);

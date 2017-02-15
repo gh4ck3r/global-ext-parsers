@@ -1,0 +1,3 @@
+R,console,test/011.TemplateLiteral.js,2:1,console.error(`${aError}`);
+R,error,test/011.TemplateLiteral.js,2:9,console.error(`${aError}`);
+R,aError,test/011.TemplateLiteral.js,2:18,console.error(`${aError}`);

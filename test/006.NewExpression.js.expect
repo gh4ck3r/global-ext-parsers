@@ -1,0 +1,1 @@
+R,Promise,test/006.NewExpression.js,2:5,new Promise((res, rej) => {});
