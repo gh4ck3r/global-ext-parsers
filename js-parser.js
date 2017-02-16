@@ -4,7 +4,12 @@
 const fs = require('fs');
 const esprima = require('esprima');
 
-const sourceFiles = process.argv.slice(2);
+const argv = process.argv.slice(2);
+const options = argv.filter(v => v.startsWith("--"));
+
+const DEBUG = options.includes("--debug");
+
+const sourceFiles = argv.filter(v => !options.includes(v));
 if (sourceFiles.length === 0) {
   console.warn(`No args`);
   process.exit(1);
@@ -86,8 +91,12 @@ function getASTParser(aFile) {
                              aParent[prop] === aAST);
 
       const idType = getIdType(aParent, prop, aAST);  // XXX aParent[prop] === aAST ??
-      if (idType === DEF || idType === REF)
+      if (idType === DEF || idType === REF) {
         console.log(`${idType},${name},${aFile},${line}:${column+1},${sources[line-1]}`);
+        if (DEBUG) {
+          console.log(`    ${aParent.type}.${prop}`);
+        }
+      }
       else if (idType === UNKNOWN) {
         console.error('\x1b[31;1m');  // ANSI code red
         console.error(`Unknown Identifier : ${name} at ${aFile} ${line}:${column+1},${sources[line-1]}`);
