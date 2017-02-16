@@ -149,16 +149,16 @@ const getIdType = (aParent, aIdProp, aAST) => {
     case "ExportDefaultDeclaration.declaration":
     case "FunctionDeclaration.id":
     case "FunctionExpression.id":
-    case "VariableDeclarator.id":
-    case "LabeledStatement.label":
     case "ImportNamespaceSpecifier.local":
+    case "LabeledStatement.label":
+    case "VariableDeclarator.id":
       return DEF;
 
     // Conditional definitions
-    case "MethodDefinition.key":
-      return name === "constructor" ? undefined : DEF;
     case "ExportSpecifier.exported":        // export { foo, bar, baz}
       return aParent.local.name === name ? undefined : DEF;
+    case "MethodDefinition.key":
+      return name === "constructor" ? undefined : DEF;
 
     // References
     case "ArrayExpression.elements":
@@ -166,14 +166,20 @@ const getIdType = (aParent, aIdProp, aAST) => {
     case "AssignmentExpression.right":
     case "BinaryExpression.left":
     case "BinaryExpression.right":
+    case "BreakStatement.label":
     case "CallExpression.arguments":
     case "ClassDeclaration.superClass":
     case "ConditionalExpression.alternate":
     case "ConditionalExpression.test":
+    case "ContinueStatement.label":
+    case "DoWhileStatement.test":
     case "ForInStatement.right":
     case "ForOfStatement.right":
+    case "ForStatement.test":
+    case "ForStatement.update":
     case "IfStatement.test":
     case "ImportDefaultSpecifier.local":
+    case "ImportSpecifier.imported":
     case "ImportSpecifier.local":
     case "LogicalExpression.left":
     case "LogicalExpression.right":
@@ -183,6 +189,7 @@ const getIdType = (aParent, aIdProp, aAST) => {
     case "NewExpression.callee":
     case "Property.value":
     case "ReturnStatement.argument":
+    case "SequenceExpression.expressions":
     case "SpreadElement.argument":
     case "SwitchCase.test":
     case "SwitchStatement.discriminant":
@@ -193,26 +200,19 @@ const getIdType = (aParent, aIdProp, aAST) => {
     case "UpdateExpression.argument":
     case "VariableDeclarator.init":
     case "WhileStatement.test":
-    case "ForStatement.test":
-    case "SequenceExpression.expressions":
-    case "ForStatement.update":
-    case "DoWhileStatement.test":
-    case "BreakStatement.label":
-    case "ContinueStatement.label":
-    case "ImportSpecifier.imported":
       return REF;
 
     // Ignored symbols
-    case "ForInStatement.left":
     case "ArrayPattern.elements":
     case "ArrowFunctionExpression.params":  // Locally defined
     case "AssignmentExpression.left":       // This is just assignment
     case "AssignmentPattern.left":
     case "CatchClause.param":
+    case "ExportSpecifier.local":
+    case "ForInStatement.left":
+    case "ForOfStatement.left":             // "b" of "for (b of buffer)"
     case "FunctionExpression.params":       // Locally defined
     case "RestElement.argument":
-    case "ForOfStatement.left":             // "b" of "for (b of buffer)"
-    case "ExportSpecifier.local":
       return;
 
     // Possibly verbose definition from here
