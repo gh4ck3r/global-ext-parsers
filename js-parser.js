@@ -8,6 +8,12 @@ const argv = process.argv.slice(2);
 const options = argv.filter(v => v.startsWith("--"));
 
 const DEBUG = options.includes("--debug");
+const ANSI = {
+  red:    "\x1b[31;1m",
+  green:  "\x1b[32;1m",
+  yellow: "\x1b[33;1m",
+  reset:  "\x1b[0m",
+};
 
 const sourceFiles = argv.filter(v => !options.includes(v));
 if (sourceFiles.length === 0) {
@@ -63,7 +69,7 @@ function exitWithError(aError) {
 function parseErrorHandler(aFile, aExit = true) {
   return function(aError) {
     const {lineNumber, description} = aError;
-    console.error(`\x1b[31;1mSyntax Error: ${aFile} at line ${lineNumber} : ${description}\x1b[0m`);
+    console.error(ANSI.red, `Syntax Error: ${aFile} at line ${lineNumber} : ${description}`, ANSI.reset);
 //    console.error(aError);
     if (aExit) process.exit(10);
   };
@@ -94,14 +100,14 @@ function getASTParser(aFile) {
       if (idType === DEF || idType === REF) {
         console.log(`${idType},${name},${aFile},${line}:${column+1},${sources[line-1]}`);
         if (DEBUG) {
-          console.log(`    ${aParent.type}.${prop}`);
+          console.log(ANSI.yellow, `    ${aParent.type}.${prop}`, ANSI.reset);
         }
       }
       else if (idType === UNKNOWN) {
-        console.error('\x1b[31;1m');  // ANSI code red
+        console.error(ANSI.red);  // ANSI code red
         console.error(`Unknown Identifier : ${name} at ${aFile} ${line}:${column+1},${sources[line-1]}`);
         console.error(`  aParentType : ${aParent.type}.${prop}`);
-        console.error(`\x1b[0m`);     // Reset ANSI code
+        console.error(ANSI.reset);     // Reset ANSI code
       }
     } else {
       const parseSubAST = aSubAST => parseAST(aSubAST, aAST);
