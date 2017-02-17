@@ -87,30 +87,39 @@ function getASTParser(aFile) {
   };
 
   // https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey/Parser_API
-  function parseAST(aAST, aParent = null) {
+  function parseAST(aAST, aParent = null, aParentProp = null, aIdx = 0) {
     const {type, name, loc: {start: {line, column}}} = aAST;
 
     if (type === "Identifier") {
-      const prop = Object.getOwnPropertyNames(aParent)
-                         .find(prop => aParent[prop] instanceof Array ?
-                             aParent[prop].includes(aAST) :
-                             aParent[prop] === aAST);
-
-      const idType = getIdType(aParent, prop, aAST);  // XXX aParent[prop] === aAST ??
+      const idType = (function() {
+        try {
+          return getIdType(aParent, aParentProp, aIdx);
+        } catch(e) {
+          if (DEBUG) {
+            console.error(ANSI.red, "===============================");
+            console.error("aParent:", aParent);
+            console.error("aParentProp:", aParentProp);
+            console.error("===============================");
+            console.error(e);
+            console.error("===============================", ANSI.reset);
+          }
+          throw e;
+        }
+      })();
       if (idType === DEF || idType === REF) {
         console.log(`${idType},${name},${aFile},${line}:${column+1},${sources[line-1]}`);
         if (DEBUG) {
-          console.log(ANSI.yellow, `    ${aParent.type}.${prop}`, ANSI.reset);
+          console.log(ANSI.yellow, `    ${aParent.type}.${aParentProp}`, ANSI.reset);
         }
       }
       else if (idType === UNKNOWN) {
         console.error(ANSI.red);  // ANSI code red
         console.error(`Unknown Identifier : ${name} at ${aFile} ${line}:${column+1},${sources[line-1]}`);
-        console.error(`  aParentType : ${aParent.type}.${prop}`);
+        console.error(`  aParentType : ${aParent.type}.${aParentProp}`);
         console.error(ANSI.reset);     // Reset ANSI code
       }
     } else {
-      const parseSubAST = aSubAST => parseAST(aSubAST, aAST);
+      const parseSubAST = (aSubAST, aPropName, aIdx) => parseAST(aSubAST, aAST, aPropName, aIdx);
       const errorHandler = parseErrorHandler(aFile, false);
       const notNullOrUndefined = v => v;
       for (let prop in aAST) {
@@ -118,22 +127,14 @@ function getASTParser(aFile) {
         else if (prop === "loc") continue;
         else if (!aAST[prop]) continue;
         else if (aAST[prop].hasOwnProperty("type")) {
-          parseSubAST(aAST[prop]);
+          parseSubAST(aAST[prop], prop);
         } else if (aAST[prop] instanceof Array) {
           const arr = aAST[prop].filter(notNullOrUndefined);
           if (prop === "errors") {
             // FIXME : This spit out even import statement
             //arr.forEach(errorHandler);
           } else {
-//try {
-            arr.forEach(parseSubAST);
-//} catch(e) {
-//  console.error("====================");
-//  console.error(e);
-//  console.error(aFile);
-//  console.error(prop, aAST);
-//  console.error("====================");
-//}
+            for (let idx in arr) parseSubAST(arr[idx], prop, idx);
           }
         }
       }
@@ -145,8 +146,11 @@ function dump(aObj) {
   console.info(JSON.stringify(aObj, null, 2));
 }
 
-const getIdType = (aParent, aIdProp, aAST) => {
-  const {type, name, loc: {start: {line, column}}} = aAST;
+const getIdType = (aParent, aIdProp, aIdx) => {
+  const {type, name, loc: {start: {line, column}}} = (function() {
+    const ast = aParent[aIdProp];
+    return ast instanceof Array ? ast[aIdx] : ast;
+  })();
   switch(`${aParent.type}.${aIdProp}`) {
     // Definitions
     case "CallExpression.callee":
@@ -165,6 +169,8 @@ const getIdType = (aParent, aIdProp, aAST) => {
       return aParent.local.name === name ? undefined : DEF;
     case "MethodDefinition.key":
       return name === "constructor" ? undefined : DEF;
+    case "ImportSpecifier.local":
+      return aParent.imported.name !== name ? DEF : REF;
 
     // References
     case "ArrayExpression.elements":
@@ -186,7 +192,6 @@ const getIdType = (aParent, aIdProp, aAST) => {
     case "IfStatement.test":
     case "ImportDefaultSpecifier.local":
     case "ImportSpecifier.imported":
-    case "ImportSpecifier.local":
     case "LogicalExpression.left":
     case "LogicalExpression.right":
     case "MemberExpression.object":
