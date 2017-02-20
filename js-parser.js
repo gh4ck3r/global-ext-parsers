@@ -3,17 +3,13 @@
 
 const fs = require('fs');
 const esprima = require('esprima');
+const ANSI = require("./ansi.js");
 
 const argv = process.argv.slice(2);
 const options = argv.filter(v => v.startsWith("--"));
 
 const DEBUG = options.includes("--debug");
-const ANSI = {
-  red:    "\x1b[31;1m",
-  green:  "\x1b[32;1m",
-  yellow: "\x1b[33;1m",
-  reset:  "\x1b[0m",
-};
+
 
 const sourceFiles = argv.filter(v => !options.includes(v));
 if (sourceFiles.length === 0) {
@@ -69,7 +65,7 @@ function exitWithError(aError) {
 function parseErrorHandler(aFile, aExit = true) {
   return function(aError) {
     const {lineNumber, description} = aError;
-    console.error(ANSI.red, `Syntax Error: ${aFile} at line ${lineNumber} : ${description}`, ANSI.reset);
+    console.error(ANSI.red`Syntax Error: ${aFile} at line ${lineNumber} : ${description}`);
 //    console.error(aError);
     if (aExit) process.exit(10);
   };
@@ -96,12 +92,14 @@ function getASTParser(aFile) {
           return getIdType(aParent, aParentProp, aIdx);
         } catch(e) {
           if (DEBUG) {
-            console.error(ANSI.red, "===============================");
+            ANSI.red.stderr();
+            console.error("===============================");
             console.error("aParent:", aParent);
             console.error("aParentProp:", aParentProp);
             console.error("===============================");
             console.error(e);
-            console.error("===============================", ANSI.reset);
+            console.error("===============================");
+            ANSI.reset.stderr();
           }
           throw e;
         }
@@ -109,14 +107,14 @@ function getASTParser(aFile) {
       if (idType === DEF || idType === REF) {
         console.log(`${idType},${name},${aFile},${line}:${column+1},${sources[line-1]}`);
         if (DEBUG) {
-          console.log(ANSI.yellow, `    ${aParent.type}.${aParentProp}`, ANSI.reset);
+          console.log(ANSI.yellow`    ${aParent.type}.${aParentProp}`);
         }
       }
       else if (idType === UNKNOWN) {
-        console.error(ANSI.red);  // ANSI code red
+        ANSI.red.stderr();
         console.error(`Unknown Identifier : ${name} at ${aFile} ${line}:${column+1},${sources[line-1]}`);
         console.error(`  aParentType : ${aParent.type}.${aParentProp}`);
-        console.error(ANSI.reset);     // Reset ANSI code
+        ANSI.reset.stderr();
       }
     } else {
       const parseSubAST = (aSubAST, aPropName, aIdx) => parseAST(aSubAST, aAST, aPropName, aIdx);
