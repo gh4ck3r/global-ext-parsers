@@ -10,6 +10,7 @@ const options = argv.filter(v => v.startsWith("--"));
 
 const DEBUG = options.includes("--debug");
 const VERBOSE = DEBUG && options.includes("--verbose");
+const DUMPAST = DEBUG && options.includes("--ast");
 
 const sourceFiles = argv.filter(v => !options.includes(v));
 if (sourceFiles.length === 0) {
@@ -66,7 +67,6 @@ function parseErrorHandler(aFile, aExit = true) {
   return function(aError) {
     const {lineNumber, description} = aError;
     console.error(ANSI.red`Syntax Error: ${aFile} at line ${lineNumber} : ${description}`);
-//    console.error(aError);
     if (aExit) process.exit(10);
   };
 }
@@ -77,88 +77,88 @@ const UNKNOWN = 'U';
 
 function getASTParser(aFile) {
   let sources;
-  return function (aParseInfo) {
+
+  return function(aParseInfo) {
     sources = aParseInfo.sourceCode.split("\n");
-    if (VERBOSE) {
+
+    if (DUMPAST) {
       ANSI.green.stderr();
       console.error("Entire AST");
       dump(aParseInfo.ast);
       ANSI.reset.stderr();
     }
+
     return parseAST(aParseInfo.ast);
   };
 
   // https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey/Parser_API
-  function parseAST(aAST, aParent = null, aParentProp = null, aIdx = 0) {
-    const {type, name, loc: {start: {line, column}}} = aAST;
-
-    if (type === "Identifier") {
-      const idType = (function() {
-        try {
-          return getIdType(aParent, aParentProp, aIdx);
-        } catch(e) {
-          if (DEBUG) {
-            ANSI.red.stderr();
-            console.error("===============================");
-            console.error("aFile:", aFile);
-            console.error("aParent:", aParent);
-            console.error("aParentProp:", aParentProp);
-            console.error("===============================");
-            console.error(e);
-            console.error("===============================");
-            ANSI.reset.stderr();
-          }
-          throw e;
-        }
-      })();
-      if (idType === DEF || idType === REF) {
-        console.log(`${idType},${name},${aFile},${line}:${column+1},${sources[line-1]}`);
+  function parseAST(aAstNode) {
+    if (aAstNode.type === "Identifier") {
+      try {
+        printIdInfo(aAstNode);
+      } catch(e) {
         if (DEBUG) {
-          console.log(ANSI.yellow`    ${aParent.type}.${aParentProp}`);
+          ANSI.red.stderr();
+          console.error("===============================");
+          console.error("aFile:", aFile);
+          console.error("AST Path :", dumpPath(aAstNode));
+          console.error("-------------------------------");
+          console.error(e);
+          console.error("===============================");
+          ANSI.reset.stderr();
         }
-      }
-      else if (idType === UNKNOWN) {
-        ANSI.red.stderr();
-        console.error(`Unknown Identifier : ${name} at ${aFile} ${line}:${column+1},${sources[line-1]}`);
-        console.error(`  aParentType : ${aParent.type}.${aParentProp}`);
-        ANSI.reset.stderr();
+        throw e;
       }
     } else {
-      const parseSubAST = (aSubAST, aPropName, aIdx) => parseAST(aSubAST, aAST, aPropName, aIdx);
       const errorHandler = parseErrorHandler(aFile, false);
-      const notNullOrUndefined = v => v;
-      for (let prop in aAST) {
-        if (prop === "type") continue;
-        else if (prop === "loc") continue;
-        else if (!aAST[prop]) continue;
-        else if (aAST[prop].hasOwnProperty("type")) {
-          parseSubAST(aAST[prop], prop);
-        } else if (aAST[prop] instanceof Array) {
-          const arr = aAST[prop].filter(notNullOrUndefined);
-          if (prop === "errors") {
-            // FIXME : This spit out even import statement
-            //arr.forEach(errorHandler);
-          } else {
-            for (let idx in arr) parseSubAST(arr[idx], prop, idx);
-          }
-        }
+      for (let prop of subAstProps(aAstNode)) {
+        // There's a node that belongs to other parent nodes. For such a case
+        // make theses two properties configurable to make it overwritten. That
+        // makes it keeps exact parent node and property where it comes through
+        // while traverse AST.
+        Object.defineProperties(aAstNode[prop], {
+          parentNode: {configurable: true, value: aAstNode},
+          parentProp: {configurable: true, value: prop},
+        });
+        parseAST(aAstNode[prop]);
       }
+    }
+  }
+
+  function printIdInfo(aIdNode) {
+    const {name, loc: {start: {line, column}}} = aIdNode;
+    const idType = deterineIdType(aIdNode);
+    switch (idType) {
+      case DEF:
+      case REF:
+        console.log(`${idType},${name},${aFile},${line}:${column+1},${sources[line-1]}`);
+        if (DEBUG) {
+          console.log(ANSI.yellow("    AST Path :", dumpPath(aIdNode)));
+        }
+        break;
+      case UNKNOWN:
+        ANSI.red.stderr();
+        console.error(`Unknown Identifier : ${name} at ${aFile} ${line}:${column+1},${sources[line-1]}`);
+        console.error("  AST Path :", dumpPath(aIdNode));
+        ANSI.reset.stderr();
+        break;
     }
   }
 }
 
-function dump(aObj) {
-  console.info(JSON.stringify(aObj, null, 2));
-}
+function deterineIdType(aIdNode) {
+  const {type, name, loc: {start: {line, column}}} = aIdNode;
 
-const getIdType = (aParent, aIdProp, aIdx) => {
-  let ast = aParent[aIdProp];
-  if (ast instanceof Array) ast = ast[aIdx];
-  if (!ast) return;
+  const {parentNode, parentProp} = (function getNonArrayParent() {
+    let {parentNode, parentProp} = aIdNode;
+    while (parentNode instanceof Array) {
+      parentProp = parentNode.parentProp;
+      parentNode = parentNode.parentNode;
+    }
+    return {parentNode, parentProp};
+  })();
 
-  const {type, name, loc: {start: {line, column}}} = ast;
-
-  switch(`${aParent.type}.${aIdProp}`) {
+  switch(`${parentNode.type}.${parentProp}`) {
     // Definitions
     case "ClassDeclaration.id":
     case "ConditionalExpression.consequent":
@@ -172,11 +172,11 @@ const getIdType = (aParent, aIdProp, aIdx) => {
 
     // Conditional definitions
     case "ExportSpecifier.exported":        // export { foo, bar, baz}
-      return aParent.local.name === name ? undefined : DEF;
+      return parentNode.local.name === name ? undefined : DEF;
     case "MethodDefinition.key":
       return name === "constructor" ? undefined : DEF;
     case "ImportSpecifier.local":
-      return aParent.imported.name !== name ? DEF : REF;
+      return parentNode.imported.name !== name ? DEF : REF;
 
     // References
     case "ArrayExpression.elements":
@@ -239,4 +239,55 @@ const getIdType = (aParent, aIdProp, aIdx) => {
       return DEF;
   }
   return UNKNOWN;
-};
+}
+
+function *subAstProps(aAstNode) {
+  for (let prop in aAstNode) {
+    switch(prop) {
+      case "type":
+      case "loc":
+        break;
+      case "errors":
+        if (VERBOSE) {  // XXX : This spits out import export statement as error
+          ANSI.red.stderr();
+          console.error("==========================================");
+          console.error("aAstNode.error : ", aAstNode.errors[0]);
+          dump(aAstNode.errors[0]);
+          console.error("------------------------------------------");
+          console.error("aAstNode: ", aAstNode);
+          console.error("==========================================");
+          ANSI.reset.stderr();
+        }
+        break;
+      default:
+        const subAST = aAstNode[prop];
+        if (isNode(subAST) || subAST instanceof Array) {
+          yield prop;
+        }
+        break;
+    }
+  }
+}
+
+// interface Node always have "type" property
+function isNode(aObj) {
+  return aObj instanceof Object && aObj.hasOwnProperty('type');
+}
+
+function dumpPath(aNode) {
+  const path = [];
+  for (let n = aNode;n.parentNode;n = n.parentNode) {
+    const {parentNode, parentProp} = n;
+    if (parentNode instanceof Array) {
+      path.unshift(`[${parentProp}]`);
+    } else {
+      path.unshift(`{${parentNode.type}}.${parentProp}`);
+    }
+  }
+  return path.join('');
+}
+
+function dump(aObj) {
+  console.info(JSON.stringify(aObj, null, 2));
+}
+
