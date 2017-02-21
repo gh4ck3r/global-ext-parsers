@@ -9,7 +9,7 @@ const argv = process.argv.slice(2);
 const options = argv.filter(v => v.startsWith("--"));
 
 const DEBUG = options.includes("--debug");
-
+const VERBOSE = DEBUG && options.includes("--verbose");
 
 const sourceFiles = argv.filter(v => !options.includes(v));
 if (sourceFiles.length === 0) {
@@ -79,6 +79,12 @@ function getASTParser(aFile) {
   let sources;
   return function (aParseInfo) {
     sources = aParseInfo.sourceCode.split("\n");
+    if (VERBOSE) {
+      ANSI.green.stderr();
+      console.error("Entire AST");
+      dump(aParseInfo.ast);
+      ANSI.reset.stderr();
+    }
     return parseAST(aParseInfo.ast);
   };
 
@@ -94,6 +100,7 @@ function getASTParser(aFile) {
           if (DEBUG) {
             ANSI.red.stderr();
             console.error("===============================");
+            console.error("aFile:", aFile);
             console.error("aParent:", aParent);
             console.error("aParentProp:", aParentProp);
             console.error("===============================");
