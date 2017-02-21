@@ -160,7 +160,6 @@ const getIdType = (aParent, aIdProp, aIdx) => {
 
   switch(`${aParent.type}.${aIdProp}`) {
     // Definitions
-    case "CallExpression.callee":
     case "ClassDeclaration.id":
     case "ConditionalExpression.consequent":
     case "ExportDefaultDeclaration.declaration":
@@ -187,6 +186,7 @@ const getIdType = (aParent, aIdProp, aIdx) => {
     case "BinaryExpression.right":
     case "BreakStatement.label":
     case "CallExpression.arguments":
+    case "CallExpression.callee":
     case "ClassDeclaration.superClass":
     case "ConditionalExpression.alternate":
     case "ConditionalExpression.test":
@@ -231,10 +231,10 @@ const getIdType = (aParent, aIdProp, aIdx) => {
     case "ForOfStatement.left":             // "b" of "for (b of buffer)"
     case "FunctionExpression.params":       // Locally defined
     case "RestElement.argument":
+    case "FunctionDeclaration.params":
       return;
 
     // Possibly verbose definition from here
-    case "FunctionDeclaration.params":
     case "Property.key":
       return DEF;
   }
