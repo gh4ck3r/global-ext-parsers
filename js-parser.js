@@ -152,10 +152,12 @@ function dump(aObj) {
 }
 
 const getIdType = (aParent, aIdProp, aIdx) => {
-  const {type, name, loc: {start: {line, column}}} = (function() {
-    const ast = aParent[aIdProp];
-    return ast instanceof Array ? ast[aIdx] : ast;
-  })();
+  let ast = aParent[aIdProp];
+  if (ast instanceof Array) ast = ast[aIdx];
+  if (!ast) return;
+
+  const {type, name, loc: {start: {line, column}}} = ast;
+
   switch(`${aParent.type}.${aIdProp}`) {
     // Definitions
     case "CallExpression.callee":
