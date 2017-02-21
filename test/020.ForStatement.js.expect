@@ -1,3 +1,0 @@
-D,i,test/020.ForStatement.js,2:10,for (let i=0;i<10;i);
-R,i,test/020.ForStatement.js,2:14,for (let i=0;i<10;i);
-R,i,test/020.ForStatement.js,2:19,for (let i=0;i<10;i);

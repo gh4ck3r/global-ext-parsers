@@ -1,3 +1,1 @@
 D,Foo,test/005.FunctionDeclaration.js,2:10,function Foo(arg1, arg2) { "function body"; }
-D,arg1,test/005.FunctionDeclaration.js,2:14,function Foo(arg1, arg2) { "function body"; }
-D,arg2,test/005.FunctionDeclaration.js,2:20,function Foo(arg1, arg2) { "function body"; }

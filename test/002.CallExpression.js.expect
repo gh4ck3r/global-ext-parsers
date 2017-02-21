@@ -1,2 +1,2 @@
 D,fs,test/002.CallExpression.js,2:7,const fs = require('fs');
-D,require,test/002.CallExpression.js,2:12,const fs = require('fs');
+R,require,test/002.CallExpression.js,2:12,const fs = require('fs');
