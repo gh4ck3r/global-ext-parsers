@@ -344,13 +344,14 @@ function isForStatementDefinedVariable(aForStatementNode, aName) {
   const {type, init} = aForStatementNode;
   console.assert(type === "ForStatement");
 
-  return (init.type === "VariableDeclaration" &&
+  return  init &&
+          init.type === "VariableDeclaration" &&
           init.declarations
               .filter(e => e.type === "VariableDeclarator")
               .some(e => {
                 const {id :{type, name}} = e;
                 return type === "Identifier" && name === aName;
-              }));
+              });
 }
 
 function isForStatementInternalId(aIdNode) {
