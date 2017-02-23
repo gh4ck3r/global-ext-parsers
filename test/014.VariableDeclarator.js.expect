@@ -1,11 +1,7 @@
-D,type,test/014.VariableDeclarator.js,2:8,const {type, name, loc: {start: {line, column}}} = aAST;
 R,type,test/014.VariableDeclarator.js,2:8,const {type, name, loc: {start: {line, column}}} = aAST;
-D,name,test/014.VariableDeclarator.js,2:14,const {type, name, loc: {start: {line, column}}} = aAST;
 R,name,test/014.VariableDeclarator.js,2:14,const {type, name, loc: {start: {line, column}}} = aAST;
 R,loc,test/014.VariableDeclarator.js,2:20,const {type, name, loc: {start: {line, column}}} = aAST;
 R,start,test/014.VariableDeclarator.js,2:26,const {type, name, loc: {start: {line, column}}} = aAST;
-D,line,test/014.VariableDeclarator.js,2:34,const {type, name, loc: {start: {line, column}}} = aAST;
 R,line,test/014.VariableDeclarator.js,2:34,const {type, name, loc: {start: {line, column}}} = aAST;
-D,column,test/014.VariableDeclarator.js,2:40,const {type, name, loc: {start: {line, column}}} = aAST;
 R,column,test/014.VariableDeclarator.js,2:40,const {type, name, loc: {start: {line, column}}} = aAST;
 R,aAST,test/014.VariableDeclarator.js,2:52,const {type, name, loc: {start: {line, column}}} = aAST;
