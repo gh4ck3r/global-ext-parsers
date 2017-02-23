@@ -83,7 +83,7 @@ function getASTParser(aFile) {
 
     if (DUMPAST) {
       ANSI.green.stderr();
-      console.error("Entire AST");
+      console.log("Entire AST");
       dump(aParseInfo.ast);
       ANSI.reset.stderr();
     }
@@ -116,14 +116,29 @@ function getASTParser(aFile) {
         // make theses two properties configurable to make it overwritten. That
         // makes it keeps exact parent node and property where it comes through
         // while traverse AST.
-        Object.defineProperties(aAstNode[prop], {
+        const subAST = aAstNode[prop];
+        Object.defineProperties(subAST, {
           parentNode: {configurable: true, value: aAstNode},
           parentProp: {configurable: true, value: prop},
+          // FIXME : This is not necessary to be configurable
+          getAncestor: {configurable: true, value: astGetAncestor(subAST)},
         });
-        parseAST(aAstNode[prop]);
+        parseAST(subAST);
       }
     }
+    function astGetAncestor(aNode) {
+      return function(aType) {
+        let {parentNode, parentProp} = aNode.parentNode;
+        while (parentNode &&
+              (parentNode instanceof Array || parentNode.type !== aType)) {
+          parentProp = parentNode.parentProp;
+          parentNode = parentNode.parentNode;
+        }
+        return [parentNode, parentProp];
+      };
+    }
   }
+
 
   function printIdInfo(aIdNode) {
     const {name, loc: {start: {line, column}}} = aIdNode;
@@ -148,6 +163,9 @@ function getASTParser(aFile) {
 
 function deterineIdType(aIdNode) {
   const {type, name, loc: {start: {line, column}}} = aIdNode;
+  console.assert(type === "Identifier",
+      "Non-Identifier node is passed",
+      aIdNode);
 
   const {parentNode, parentProp} = (function getNonArrayParent() {
     let {parentNode, parentProp} = aIdNode;
@@ -167,7 +185,6 @@ function deterineIdType(aIdNode) {
     case "FunctionExpression.id":
     case "ImportNamespaceSpecifier.local":
     case "LabeledStatement.label":
-    case "VariableDeclarator.id":
       return DEF;
 
     // Conditional definitions
@@ -177,13 +194,50 @@ function deterineIdType(aIdNode) {
       return name === "constructor" ? undefined : DEF;
     case "ImportSpecifier.local":
       return parentNode.imported.name !== name ? DEF : REF;
+    case "Property.key":
+      if (parentNode.shorthand) {
+        // shorthand is always reference
+        // It'll reported as REF by "Property.value"
+        return;
+      } else {
+        const [ ancestorNode, prop ] = aIdNode.getAncestor("VariableDeclarator");
+        if (ancestorNode) {
+          switch (prop) {
+            case "init":
+              if (parentNode.key !== parentNode.value) return DEF;  // for variable declara
+              break;
+            case "id":
+              if (parentNode.key === parentNode.value) return DEF;  // for variable declara
+              break;
+          }
+        }
+      }
+      return REF;
+    case "VariableDeclarator.id": {
+      let [ ancestorNode, prop ] = aIdNode.getAncestor("ForInStatement");
+      if (ancestorNode && prop === "left") return;
+      [ ancestorNode, prop ] = aIdNode.getAncestor("ForStatement");
+      if (ancestorNode && prop === "init") return;
+      return DEF;
+    }
+    case "BinaryExpression.left":
+    case "BinaryExpression.right":
+    case "UpdateExpression.argument":
+    case "UnaryExpression.argument": {
+      if (isForStatementInternalId(aIdNode)) return;
+      return REF;
+    }
+    case "ForStatement.update": {
+      if (isForStatementDefinedVariable(parentNode, name)) return;
+      return REF;
+    }
+    case "ArrayPattern.elements": // An array-destructuring pattern.
+      return DEF;
 
     // References
     case "ArrayExpression.elements":
     case "ArrowFunctionExpression.body":
     case "AssignmentExpression.right":
-    case "BinaryExpression.left":
-    case "BinaryExpression.right":
     case "BreakStatement.label":
     case "CallExpression.arguments":
     case "CallExpression.callee":
@@ -195,7 +249,6 @@ function deterineIdType(aIdNode) {
     case "ForInStatement.right":
     case "ForOfStatement.right":
     case "ForStatement.test":
-    case "ForStatement.update":
     case "IfStatement.test":
     case "ImportDefaultSpecifier.local":
     case "ImportSpecifier.imported":
@@ -214,14 +267,11 @@ function deterineIdType(aIdNode) {
     case "TaggedTemplateExpression.tag":
     case "TemplateLiteral.expressions":
     case "ThrowStatement.argument":
-    case "UnaryExpression.argument":
-    case "UpdateExpression.argument":
     case "VariableDeclarator.init":
     case "WhileStatement.test":
       return REF;
 
     // Ignored symbols
-    case "ArrayPattern.elements":
     case "ArrowFunctionExpression.params":  // Locally defined
     case "AssignmentExpression.left":       // This is just assignment
     case "AssignmentPattern.left":
@@ -235,8 +285,6 @@ function deterineIdType(aIdNode) {
       return;
 
     // Possibly verbose definition from here
-    case "Property.key":
-      return DEF;
   }
   return UNKNOWN;
 }
@@ -291,3 +339,23 @@ function dump(aObj) {
   console.info(JSON.stringify(aObj, null, 2));
 }
 
+// XXX : Think about make this a hidden method of ForStatement node
+function isForStatementDefinedVariable(aForStatementNode, aName) {
+  const {type, init} = aForStatementNode;
+  console.assert(type === "ForStatement");
+
+  return (init.type === "VariableDeclaration" &&
+          init.declarations
+              .filter(e => e.type === "VariableDeclarator")
+              .some(e => {
+                const {id :{type, name}} = e;
+                return type === "Identifier" && name === aName;
+              }));
+}
+
+function isForStatementInternalId(aIdNode) {
+  const [ ancestorNode, prop ] = aIdNode.getAncestor("ForStatement");
+  return ancestorNode &&
+      ["test", "update"].includes(prop) &&
+      isForStatementDefinedVariable(ancestorNode, aIdNode.name);
+}
