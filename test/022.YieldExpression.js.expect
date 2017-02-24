@@ -1,0 +1,2 @@
+D,gen,test/022.YieldExpression.js,1:11,function *gen() {yield val;}
+R,val,test/022.YieldExpression.js,1:24,function *gen() {yield val;}
