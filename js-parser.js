@@ -270,6 +270,7 @@ function deterineIdType(aIdNode) {
     case "VariableDeclarator.init":
     case "WhileStatement.test":
     case "YieldExpression.argument":
+    case "ExpressionStatement.expression":
       return REF;
 
     // Ignored symbols
