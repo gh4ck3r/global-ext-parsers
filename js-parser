@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// vim:ft=javascript:ts=2:sw=2:expandtab:
 "use strict";
 
 const fs = require('fs');
