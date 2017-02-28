@@ -2,10 +2,18 @@
 // vim:ft=javascript:ts=2:sw=2:et:
 "use strict";
 
-const {readFile, exitWithError, printSymbol} = require('./common.js');
+const {readFile, exitWithError, printTag} = require('./common.js');
+const {tagJavaScript} = require("./js-parser.js");
 
 const argv = process.argv.slice(2);
 const options = argv.filter(v => v.startsWith("--"));
+
+const [DEBUG, VERBOSE] = (function() {
+  const options = process.argv.slice(2).filter(v => v.startsWith("--"));
+  const debug = options.includes("--debug");
+  const verbose = debug && options.includes("--verbose");
+  return [debug, verbose];
+})();
 
 const sourceFiles = argv.filter(v => !options.includes(v));
 if (sourceFiles.length === 0) {
@@ -20,13 +28,16 @@ const UNKNOWN = 'U';
 const htmlparser = require("htmlparser2");
 let curFile, curLine, sources;
 
+let inScript = false;
+let lineBeginScript = 0;
+let javaScript = [];
 const parser = new htmlparser.Parser({
   onattribute: (aName, aValue) => {
     switch (aName) {
       case "id":
       case "class":
         const column = 0;//sources[curLine-1].indexOf(aValue);  // FIXME
-        printSymbol({
+        printTag({
           type: DEF,
           name: aValue,
           path: curFile,
@@ -34,10 +45,33 @@ const parser = new htmlparser.Parser({
           col: column+1,
           ref: sources[curLine-1]
         });
-
         break;
     }
   },
+  onopentagname(aName) {
+    if (aName === "script") {
+      inScript = true;
+      lineBeginScript = curLine;
+    }
+  },
+  onclosetag(aName) {
+    if (aName === "script") {
+      inScript = false;
+      const src = javaScript.join('\n');
+      if (src.trim().length) {
+        const column = sources[lineBeginScript-1].indexOf(javaScript[0])+1;
+        console.log("Script :", curFile, lineBeginScript, column);
+        console.log(src);
+        tagJavaScript(src, curFile, lineBeginScript, column);
+        // TODO : parse JavaScript
+      }
+      javaScript.length = 0;
+    }
+  },
+  ontext(aText) {
+    if (!inScript) return;
+    javaScript.push(aText);
+  }
 }, {decodeEntities: true, lowerCaseAttributeNames: true});
 
 sourceFiles.forEach(file => {

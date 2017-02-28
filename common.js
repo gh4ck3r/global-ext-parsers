@@ -1,10 +1,15 @@
 "use strict";
 // vim:ft=javascript:ts=2:sw=2:et:
 
-/* global exports, require, process */
+/* global module, require, process */
 const fs = require('fs');
+module.exports = {
+  readFile,
+  exitWithError,
+  printTag,
+};
 
-exports.readFile = function readFile(aSourceFile) {
+function readFile(aSourceFile) {
   return new Promise((resolve, reject) => {
     fs.readFile(aSourceFile, (err, data) => {
       if (err) {
@@ -14,14 +19,14 @@ exports.readFile = function readFile(aSourceFile) {
       }
     });
   });
-};
+}
 
-exports.exitWithError = function exitWithError(aError) {
+function exitWithError(aError) {
   console.error(`${aError}`);
   process.exit(aError.errno);
-};
+}
 
-exports.printSymbol =
-function printSymbol({type, name, path, line, col, ref}) {
+function printTag({type, name, path, line, col, ref}) {
   console.log(`${type},${name},${path},${line}:${col},${ref}`);
-};
+}
+
