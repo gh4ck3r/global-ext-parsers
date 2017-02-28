@@ -1,0 +1,55 @@
+#!/usr/bin/env node
+// vim:ft=javascript:ts=2:sw=2:et:
+"use strict";
+
+const {readFile, exitWithError, printSymbol} = require('./common.js');
+
+const argv = process.argv.slice(2);
+const options = argv.filter(v => v.startsWith("--"));
+
+const sourceFiles = argv.filter(v => !options.includes(v));
+if (sourceFiles.length === 0) {
+  console.warn(`No args`);
+  process.exit(1);
+}
+
+const DEF = 'D';
+const REF = 'R';
+const UNKNOWN = 'U';
+
+const htmlparser = require("htmlparser2");
+let curFile, curLine, sources;
+
+const parser = new htmlparser.Parser({
+  onattribute: (aName, aValue) => {
+    switch (aName) {
+      case "id":
+      case "class":
+        const column = 0;//sources[curLine-1].indexOf(aValue);  // FIXME
+        printSymbol({
+          type: DEF,
+          name: aValue,
+          path: curFile,
+          line: curLine,
+          col: column+1,
+          ref: sources[curLine-1]
+        });
+
+        break;
+    }
+  },
+}, {decodeEntities: true, lowerCaseAttributeNames: true});
+
+sourceFiles.forEach(file => {
+  readFile(file)
+    .catch(exitWithError)
+    .then(aContent => {
+      curFile = file;
+      sources = aContent.split('\n');
+      for (let idx = 0; idx < sources.length; ++idx) {
+        curLine = idx+1;
+        parser.write(sources[idx]);
+      }
+    })
+    .then( () => {parser.end();} );
+});
