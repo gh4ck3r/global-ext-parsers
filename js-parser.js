@@ -97,30 +97,19 @@ function getASTTagger(aFile, aLineOffset = 0, aColumnOffset = 0) {
     } else {
       const errorHandler = parseErrorHandler(aFile, false);
       for (let prop of subAstProps(aAstNode)) {
-        // There's a node that belongs to other parent nodes. For such a case
-        // make theses two properties configurable to make it overwritten. That
-        // makes it keeps exact parent node and property where it comes through
-        // while traverse AST.
+        // There's a node that belongs to other parent nodes with other property
+        // names. For such a case clone it with Object.assign()
+        if (aAstNode[prop].hasOwnProperty("parentNode")) {
+          aAstNode[prop] = Object.assign({}, aAstNode[prop]);
+        }
         const subAST = aAstNode[prop];
         Object.defineProperties(subAST, {
-          parentNode: {configurable: true, value: aAstNode},
-          parentProp: {configurable: true, value: prop},
-          // FIXME : This is not necessary to be configurable
-          getAncestor: {configurable: true, value: astGetAncestor(subAST)},
+          parentNode: {value: aAstNode},
+          parentProp: {value: prop},
+          getAncestor: {value: astGetAncestorNode(subAST)},
         });
         parseAST(subAST);
       }
-    }
-    function astGetAncestor(aNode) {
-      return function(aType) {
-        let {parentNode, parentProp} = aNode.parentNode;
-        while (parentNode &&
-              (parentNode instanceof Array || parentNode.type !== aType)) {
-          parentProp = parentNode.parentProp;
-          parentNode = parentNode.parentNode;
-        }
-        return [parentNode, parentProp];
-      };
     }
   }
 
@@ -313,6 +302,18 @@ function *subAstProps(aAstNode) {
 // interface Node always have "type" property
 function isNode(aObj) {
   return aObj instanceof Object && aObj.hasOwnProperty('type');
+}
+
+function astGetAncestorNode(aNode) {
+  return function(aType) {
+    let {parentNode, parentProp} = aNode.parentNode;
+    while (parentNode &&
+          (parentNode instanceof Array || parentNode.type !== aType)) {
+      parentProp = parentNode.parentProp;
+      parentNode = parentNode.parentNode;
+    }
+    return [parentNode, parentProp];
+  };
 }
 
 function dumpPath(aNode) {
