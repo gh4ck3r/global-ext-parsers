@@ -14,7 +14,7 @@ const [DEBUG, VERBOSE, DUMPAST] = (function() {
 })();
 
 const esprima = require('esprima');
-const ANSI = require("./ansi.js");
+const ANSI = require("ansi-string");
 
 module.exports = {
   tagJavaScript,
