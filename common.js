@@ -26,7 +26,7 @@ function exitWithError(aError) {
   process.exit(aError.errno);
 }
 
-function printTag({type, name, path, line, col, ref}) {
-  console.log(`${type},${name},${path},${line}:${col},${ref}`);
+function printTag({type, name, path, line, column, ref}) {
+  console.log(`${type},${name},${path},${line}:${column},${ref}`);
 }
 

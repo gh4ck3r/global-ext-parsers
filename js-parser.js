@@ -21,12 +21,30 @@ module.exports = {
   tagJavaScriptFile
 };
 
-function tagJavaScript(aSources, aPath, aLineOffset = 0, aColumnOffset = 0) {
-  const tagger = getASTTagger(aPath, aLineOffset, aColumnOffset);
+const DEF = 'D';
+const REF = 'R';
+const NOTHING = 'N';
+
+function tagJavaScript(aSourceCodes, aPath, aLineOffset = 0, aColumnOffset = 0) {
+  if (!aSourceCodes || !aPath) {
+    throw new TypeError("Source code and its path must be given.");
+  }
+
+  let ast;
   try {
-    tagger(parseJS(aSources));
+    ast = parseJS(aSourceCodes);
   } catch(e) {
-    parseErrorHandler(aPath)(e);
+    const {lineNumber, description} = e;
+    if (lineNumber && description) {
+      console.error(ANSI.red`Syntax Error: ${aPath} at line ${lineNumber} : ${description}`);
+    } else {
+      console.error(ANSI.red`${e}`);
+    }
+    process.exit(10);
+  }
+
+  if (ast) {
+    tagAST(ast, aSourceCodes, aPath, aLineOffset, aColumnOffset);
   }
 }
 
@@ -36,116 +54,70 @@ function tagJavaScriptFile(aPath) {
     .then(src => tagJavaScript(src, aPath));
 }
 
-function parseJS(aSourceCode) {
+function parseJS(aSourceCodes) {
   let ast;
   const option = {loc: true, tolerant: true};
   try {
-    ast = esprima.parse(aSourceCode, option);
+    ast = esprima.parse(aSourceCodes, option);
+    decorateAST(ast);
   } catch(e) {
     option.sourceType = "module";
-    ast = esprima.parse(aSourceCode, option);
+    ast = esprima.parse(aSourceCodes, option);
   }
-  return {sourceCode: aSourceCode, ast};
+  return ast;
 }
 
-function parseErrorHandler(aFile, aExit = true) {
-  return function(aError) {
-    const {lineNumber, description} = aError;
-    console.error(ANSI.red`Syntax Error: ${aFile} at line ${lineNumber} : ${description}`);
-    if (aExit) process.exit(10);
-  };
-}
+function tagAST(aAST, aSourceCodes, aFile, aLineOffset = 0, aColumnOffset = 0) {
+  const sources = aSourceCodes.split("\n");
 
-const DEF = 'D';
-const REF = 'R';
-const UNKNOWN = 'U';
-
-function getASTTagger(aFile, aLineOffset = 0, aColumnOffset = 0) {
-  let sources;
-
-  return function(aParseInfo) {
-    sources = aParseInfo.sourceCode.split("\n");
-
-    if (DUMPAST) {
-      ANSI.green.stderr();
-      console.log("Entire AST");
-      dump(aParseInfo.ast);
-      ANSI.reset.stderr();
-    }
-
-    return parseAST(aParseInfo.ast);
-  };
+  if (DUMPAST) {
+    ANSI.green.stderr();
+    console.log("Entire AST");
+    dump(aAST);
+    ANSI.reset.stderr();
+  }
 
   // https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey/Parser_API
-  function parseAST(aAstNode) {
-    if (aAstNode.type === "Identifier") {
-      try {
-        printIdInfo(aAstNode);
-      } catch(e) {
-        if (DEBUG) {
-          ANSI.red.stderr();
-          console.error("===============================");
-          console.error("aFile:", aFile);
-          console.error("AST Path :", dumpPath(aAstNode));
-          console.error("-------------------------------");
-          console.error(e);
-          console.error("===============================");
-          ANSI.reset.stderr();
-        }
-        throw e;
-      }
-    } else {
-      const errorHandler = parseErrorHandler(aFile, false);
-      for (let prop of subAstProps(aAstNode)) {
-        // There's a node that belongs to other parent nodes with other property
-        // names. For such a case clone it with Object.assign()
-        if (aAstNode[prop].hasOwnProperty("parentNode")) {
-          aAstNode[prop] = Object.assign({}, aAstNode[prop]);
-        }
-        const subAST = aAstNode[prop];
-        Object.defineProperties(subAST, {
-          parentNode: {value: aAstNode},
-          parentProp: {value: prop},
-          getAncestor: {value: astGetAncestorNode(subAST)},
-        });
-        parseAST(subAST);
-      }
-    }
-  }
-
-  function printIdInfo(aIdNode) {
-    const {name, loc: {start: {line, column}}} = aIdNode;
-    const idType = deterineIdType(aIdNode);
-    switch (idType) {
-      case DEF:
-      case REF:
-        printTag({
-          type: idType,
-          name,
-          path: aFile,
-          line: line + aLineOffset,
-          col: column+1 + aColumnOffset,
-          ref: sources[line-1]
-        });
-        if (DEBUG) {
-          console.log(ANSI.yellow("    AST Path :", dumpPath(aIdNode)));
-        }
-        break;
-      case UNKNOWN:
+  for (const identifier of aAST.descendants("Identifier")) {
+    try {
+      if (!identifier.tagType) {
         ANSI.red.stderr();
+        const {tagInfo: {name, line, column}, path} = identifier;
         console.error(`Unknown Identifier : ${name} at ${aFile} ${line}:${column+1},${sources[line-1]}`);
-        console.error("  AST Path :", dumpPath(aIdNode));
+        console.error("  AST Path :", path);
         ANSI.reset.stderr();
-        break;
+      }
+
+      for (const node of identifier.tags) {
+        const {tagInfo} = node;
+        tagInfo.path    = aFile;
+        tagInfo.ref     = sources[tagInfo.line-1];
+        tagInfo.line   += aLineOffset;
+        tagInfo.column += 1 + aColumnOffset;
+        printTag(tagInfo);
+        if (DEBUG) {
+          console.log(ANSI.yellow("    AST Path :", identifier.path));
+        }
+      }
+    } catch(e) {
+      if (DEBUG) {
+        ANSI.red.stderr();
+        console.error("===============================");
+        console.error("aFile:", aFile);
+        console.error("AST Path :", identifier.path);
+        console.error("-------------------------------");
+        console.error(e);
+        console.error("===============================");
+        ANSI.reset.stderr();
+      }
+      throw e;
     }
   }
 }
 
-function deterineIdType(aIdNode) {
-  const {type, name, loc: {start: {line, column}}} = aIdNode;
-  console.assert(type === "Identifier",
-      "Non-Identifier node is passed",
-      aIdNode);
+function determineTagType(aIdNode) {
+  const {type, name} = aIdNode;
+  if (type !== "Identifier") return NOTHING;
 
   const {parentNode, parentProp} = (function getNonArrayParent() {
     let {parentNode, parentProp} = aIdNode;
@@ -165,20 +137,21 @@ function deterineIdType(aIdNode) {
     case "FunctionExpression.id":
     case "ImportNamespaceSpecifier.local":
     case "LabeledStatement.label":
+      aIdNode.tag = DEF;
       return DEF;
 
     // Conditional definitions
     case "ExportSpecifier.exported":        // export { foo, bar, baz}
-      return parentNode.local.name === name ? undefined : DEF;
+      return parentNode.local.name === name ? NOTHING : DEF;
     case "MethodDefinition.key":
-      return name === "constructor" ? undefined : DEF;
+      return name === "constructor" ? NOTHING : DEF;
     case "ImportSpecifier.local":
       return parentNode.imported.name !== name ? DEF : REF;
     case "Property.key":
       if (parentNode.shorthand) {
         // shorthand is always reference
         // It'll reported as REF by "Property.value"
-        return;
+        return NOTHING;
       } else {
         const [ ancestorNode, prop ] = aIdNode.getAncestor("VariableDeclarator");
         if (ancestorNode) {
@@ -195,20 +168,20 @@ function deterineIdType(aIdNode) {
       return REF;
     case "VariableDeclarator.id": {
       let [ ancestorNode, prop ] = aIdNode.getAncestor("ForInStatement");
-      if (ancestorNode && prop === "left") return;
+      if (ancestorNode && prop === "left") return NOTHING;
       [ ancestorNode, prop ] = aIdNode.getAncestor("ForStatement");
-      if (ancestorNode && prop === "init") return;
+      if (ancestorNode && prop === "init") return NOTHING;
       return DEF;
     }
     case "BinaryExpression.left":
     case "BinaryExpression.right":
     case "UpdateExpression.argument":
     case "UnaryExpression.argument": {
-      if (isForStatementInternalId(aIdNode)) return;
+      if (isForStatementInternalId(aIdNode)) return NOTHING;
       return REF;
     }
     case "ForStatement.update": {
-      if (isForStatementDefinedVariable(parentNode, name)) return;
+      if (isForStatementDefinedVariable(parentNode, name)) return NOTHING;
       return REF;
     }
     case "ArrayPattern.elements": // An array-destructuring pattern.
@@ -264,14 +237,15 @@ function deterineIdType(aIdNode) {
     case "FunctionExpression.params":       // Locally defined
     case "RestElement.argument":
     case "FunctionDeclaration.params":
-      return;
+      return NOTHING;
 
     // Possibly verbose definition from here
   }
-  return UNKNOWN;
+  return;
 }
 
-function *subAstProps(aAstNode) {
+function *subAstNodeProps(aAstNode) {
+  if (!(isNode(aAstNode) || aAstNode instanceof Array)) return;
   for (let prop in aAstNode) {
     switch(prop) {
       case "type":
@@ -304,31 +278,6 @@ function isNode(aObj) {
   return aObj instanceof Object && aObj.hasOwnProperty('type');
 }
 
-function astGetAncestorNode(aNode) {
-  return function(aType) {
-    let {parentNode, parentProp} = aNode.parentNode;
-    while (parentNode &&
-          (parentNode instanceof Array || parentNode.type !== aType)) {
-      parentProp = parentNode.parentProp;
-      parentNode = parentNode.parentNode;
-    }
-    return [parentNode, parentProp];
-  };
-}
-
-function dumpPath(aNode) {
-  const path = [];
-  for (let n = aNode;n.parentNode;n = n.parentNode) {
-    const {parentNode, parentProp} = n;
-    if (parentNode instanceof Array) {
-      path.unshift(`[${parentProp}]`);
-    } else {
-      path.unshift(`{${parentNode.type}}.${parentProp}`);
-    }
-  }
-  return path.join('');
-}
-
 function dump(aObj) {
   console.info(JSON.stringify(aObj, null, 2));
 }
@@ -353,4 +302,129 @@ function isForStatementInternalId(aIdNode) {
   return ancestorNode &&
       ["test", "update"].includes(prop) &&
       isForStatementDefinedVariable(ancestorNode, aIdNode.name);
+}
+
+function decorateAST(aAstNode) {
+  Object.defineProperties(aAstNode, {
+    descendants: {value: findDescendants},
+    getAncestor: {value: astGetAncestorNode},
+    path: {get: pathGetter},
+    tagType: {configurable: true, get: function() { // lazyLoader
+      const value = determineTagType(this);
+      Object.defineProperty(this, "tagType", {value});
+      return value;
+    }},
+    tagInfo: {get: function() {
+      const {tagType: type, name, loc: {start: {line, column}}} = this;
+      return {type, name, line, column};
+    }},
+    tags: {get: function*() {
+      const {tagType, name, parentNode} = this;
+      switch (tagType) {
+        case DEF:
+        case REF:
+          yield this;
+        case NOTHING:
+          break;
+        default:
+          return;
+      }
+
+      const selectors = ["querySelector", "querySelectorAll"];
+      if (selectors.includes(name) && parentNode.type === "MemberExpression") {
+        let callExpression = parentNode;
+        while(callExpression.type === "MemberExpression")
+          callExpression = callExpression.parentNode;
+        if (callExpression.type === "CallExpression") {
+          const selector = callExpression.arguments[0];
+          if (["Literal", "TemplateLiteral"].includes(selector.type)) {
+            yield *tagInfoFromLiteral(selector);
+          }
+        }
+      }
+    }},
+  });
+
+  for (let prop of subAstNodeProps(aAstNode)) {
+    // There's a node that belongs to other parent nodes with other property
+    // names. For such a case clone it with Object.assign()
+    if (aAstNode[prop].hasOwnProperty("parentNode")) {
+      aAstNode[prop] = Object.assign({}, aAstNode[prop]);
+    }
+    const subAST = aAstNode[prop];
+    Object.defineProperties(subAST, {
+      parentNode: {value: aAstNode},
+      parentProp: {value: prop},
+    });
+    decorateAST(subAST);
+  }
+
+  function *findDescendants(...aTypes) {
+    for (let prop of subAstNodeProps(this)) { // jshint ignore:line
+      const subNode = this[prop];             // jshint ignore:line
+      if (subNode) {
+        if (aTypes.length === 0 || aTypes.includes(subNode.type)) {
+          yield subNode;
+        }
+        yield *subNode.descendants(...aTypes);
+      }
+    }
+  }
+
+  function astGetAncestorNode(aType) {
+    let {parentNode, parentProp} = this.parentNode; // jshint ignore:line
+    while (parentNode &&
+          (parentNode instanceof Array || parentNode.type !== aType)) {
+      parentProp = parentNode.parentProp;
+      parentNode = parentNode.parentNode;
+    }
+    return [parentNode, parentProp];
+  }
+
+  function pathGetter() {
+    const path = [];
+    for (let n = this;  // jshint ignore:line
+        n.parentNode;
+        n = n.parentNode) {
+      const {parentNode, parentProp} = n;
+      if (parentNode instanceof Array) {
+        path.unshift(`[${parentProp}]`);
+      } else {
+        path.unshift(`{${parentNode.type}}.${parentProp}`);
+      }
+    }
+    return path.join('');
+  }
+}
+
+function* tagInfoFromLiteral(aLiteralNode) {
+  const {value, line, column} = (function(){
+    switch(aLiteralNode.type) {
+      case "Literal": {
+        const {value, loc:{start:{line, column}}} = aLiteralNode;
+        return {value, line, column};
+      }
+      case "TemplateLiteral": {
+        const {value: {raw: value}, loc:{start:{line, column}}} =
+          aLiteralNode.quasis[0];
+        return {value, line, column};
+      }
+    }
+  })();
+
+  for (const id of value.match(/[\.#]\b[\w-]+\b/g)) {
+    const splitStrings = value.split('\n');
+    let nLineOffset = 0, nColOffset;
+    for (nColOffset = splitStrings[nLineOffset].indexOf(id);
+        nColOffset === -1;
+        nColOffset = splitStrings[++nLineOffset].indexOf(id));
+    yield { tagInfo: {
+      type: REF,
+      line: line + nLineOffset,
+      column: nLineOffset ?
+        1 + nColOffset :          // 1 for quotation mark that begins literal
+        2 + column + nColOffset,  // 1 for prefix '.' or '#'
+      name: id.slice(1),  // remove prefix '.' or '#'
+    }};
+  }
 }

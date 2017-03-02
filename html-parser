@@ -42,7 +42,7 @@ const parser = new htmlparser.Parser({
           name: aValue,
           path: curFile,
           line: curLine,
-          col: column+1,
+          column: column+1,
           ref: sources[curLine-1]
         });
         break;
