@@ -27,6 +27,7 @@ const parser = new htmlparser.Parser({
     switch (aName) {
       case "id":
       case "class":
+      case "name":
         const column = 0;//sources[curLine-1].indexOf(aValue);  // FIXME
         printTag({
           type: DEF,
