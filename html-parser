@@ -8,13 +8,6 @@ const {tagJavaScript} = require("./js-parser.js");
 const argv = process.argv.slice(2);
 const options = argv.filter(v => v.startsWith("--"));
 
-const [DEBUG, VERBOSE] = (function() {
-  const options = process.argv.slice(2).filter(v => v.startsWith("--"));
-  const debug = options.includes("--debug");
-  const verbose = debug && options.includes("--verbose");
-  return [debug, verbose];
-})();
-
 const sourceFiles = argv.filter(v => !options.includes(v));
 if (sourceFiles.length === 0) {
   console.warn(`No args`);
@@ -22,8 +15,6 @@ if (sourceFiles.length === 0) {
 }
 
 const DEF = 'D';
-const REF = 'R';
-const UNKNOWN = 'U';
 
 const htmlparser = require("htmlparser2");
 let curFile, curLine, sources;
