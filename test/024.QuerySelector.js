@@ -9,6 +9,10 @@ document.querySelector(`
 document.querySelector("#id-a");
 document.querySelector("div#id-a");
 
+document.querySelectorAll("div.class-a");
+document.querySelectorAll("*");
+document.querySelectorAll(`${classes}`);
+
 document.getElementById("id-a");
 document.getElementsByClassName("class-a class-b");
 document.getElementsByName("name-a");
