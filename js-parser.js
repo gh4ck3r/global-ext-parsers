@@ -330,7 +330,13 @@ function decorateAST(aAstNode) {
           return;
       }
 
-      const selectors = ["querySelector", "querySelectorAll"];
+      const selectors = [
+        "querySelector",
+        "querySelectorAll",
+        "getElementById",
+        "getElementsByClassName",
+        "getElementsByName",
+      ];
       if (selectors.includes(name) && parentNode.type === "MemberExpression") {
         let callExpression = parentNode;
         while(callExpression.type === "MemberExpression")
@@ -338,7 +344,7 @@ function decorateAST(aAstNode) {
         if (callExpression.type === "CallExpression") {
           const selector = callExpression.arguments[0];
           if (["Literal", "TemplateLiteral"].includes(selector.type)) {
-            yield *tagInfoFromLiteral(selector);
+            yield *tagInfoFromLiteral(selector, name.startsWith("querySelector"));
           }
         }
       }
@@ -397,7 +403,7 @@ function decorateAST(aAstNode) {
   }
 }
 
-function* tagInfoFromLiteral(aLiteralNode) {
+function* tagInfoFromLiteral(aLiteralNode, isSelector = false) {
   const {value, line, column} = (function(){
     switch(aLiteralNode.type) {
       case "Literal": {
@@ -412,19 +418,22 @@ function* tagInfoFromLiteral(aLiteralNode) {
     }
   })();
 
-  for (const id of value.match(/[\.#]\b[\w-]+\b/g)) {
+  const idPtrn = isSelector ? /[\.#]\b[\w-]+\b/g : /\b[\w-]+\b/g;
+  for (const id of value.match(idPtrn)) {
     const splitStrings = value.split('\n');
     let nLineOffset = 0, nColOffset;
     for (nColOffset = splitStrings[nLineOffset].indexOf(id);
         nColOffset === -1;
         nColOffset = splitStrings[++nLineOffset].indexOf(id));
+    const prefixLen = isSelector ? 1 : 0;
     yield { tagInfo: {
       type: REF,
       line: line + nLineOffset,
       column: nLineOffset ?
-        1 + nColOffset :          // 1 for quotation mark that begins literal
-        2 + column + nColOffset,  // 1 for prefix '.' or '#'
-      name: id.slice(1),  // remove prefix '.' or '#'
+        prefixLen + nColOffset :
+        // 1 for quotation mark that begins literal
+        1 + column + prefixLen + nColOffset,
+      name: id.slice(prefixLen),  // remove prefix '.' or '#'
     }};
   }
 }
