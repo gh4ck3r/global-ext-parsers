@@ -419,21 +419,24 @@ function* tagInfoFromLiteral(aLiteralNode, isSelector = false) {
   })();
 
   const idPtrn = isSelector ? /[\.#]\b[\w-]+\b/g : /\b[\w-]+\b/g;
-  for (const id of value.match(idPtrn)) {
-    const splitStrings = value.split('\n');
-    let nLineOffset = 0, nColOffset;
-    for (nColOffset = splitStrings[nLineOffset].indexOf(id);
-        nColOffset === -1;
-        nColOffset = splitStrings[++nLineOffset].indexOf(id));
-    const prefixLen = isSelector ? 1 : 0;
-    yield { tagInfo: {
-      type: REF,
-      line: line + nLineOffset,
-      column: nLineOffset ?
-        prefixLen + nColOffset :
-        // 1 for quotation mark that begins literal
-        1 + column + prefixLen + nColOffset,
-      name: id.slice(prefixLen),  // remove prefix '.' or '#'
-    }};
+  const ids = value.match(idPtrn);
+  if (ids) {
+    for (const id of ids) {
+      const splitStrings = value.split('\n');
+      let nLineOffset = 0, nColOffset;
+      for (nColOffset = splitStrings[nLineOffset].indexOf(id);
+          nColOffset === -1;
+          nColOffset = splitStrings[++nLineOffset].indexOf(id));
+      const prefixLen = isSelector ? 1 : 0;
+      yield { tagInfo: {
+        type: REF,
+        line: line + nLineOffset,
+        column: nLineOffset ?
+          prefixLen + nColOffset :
+          // 1 for quotation mark that begins literal
+          1 + column + prefixLen + nColOffset,
+        name: id.slice(prefixLen),  // remove prefix '.' or '#'
+      }};
+    }
   }
 }
