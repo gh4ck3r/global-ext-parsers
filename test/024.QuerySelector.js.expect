@@ -13,3 +13,19 @@ R,document,test/024.QuerySelector.js,5:1,document.querySelector(`
 R,querySelector,test/024.QuerySelector.js,5:10,document.querySelector(`
 R,class-a,test/024.QuerySelector.js,6:9,    div.class-a
 R,class-b,test/024.QuerySelector.js,7:9,    div.class-b
+R,document,test/024.QuerySelector.js,9:1,document.querySelector("#id-a");
+R,querySelector,test/024.QuerySelector.js,9:10,document.querySelector("#id-a");
+R,id-a,test/024.QuerySelector.js,9:26,document.querySelector("#id-a");
+R,document,test/024.QuerySelector.js,10:1,document.querySelector("div#id-a");
+R,querySelector,test/024.QuerySelector.js,10:10,document.querySelector("div#id-a");
+R,id-a,test/024.QuerySelector.js,10:29,document.querySelector("div#id-a");
+R,document,test/024.QuerySelector.js,12:1,document.getElementById("id-a");
+R,getElementById,test/024.QuerySelector.js,12:10,document.getElementById("id-a");
+R,id-a,test/024.QuerySelector.js,12:26,document.getElementById("id-a");
+R,document,test/024.QuerySelector.js,13:1,document.getElementsByClassName("class-a class-b");
+R,getElementsByClassName,test/024.QuerySelector.js,13:10,document.getElementsByClassName("class-a class-b");
+R,class-a,test/024.QuerySelector.js,13:34,document.getElementsByClassName("class-a class-b");
+R,class-b,test/024.QuerySelector.js,13:42,document.getElementsByClassName("class-a class-b");
+R,document,test/024.QuerySelector.js,14:1,document.getElementsByName("name-a");
+R,getElementsByName,test/024.QuerySelector.js,14:10,document.getElementsByName("name-a");
+R,name-a,test/024.QuerySelector.js,14:29,document.getElementsByName("name-a");

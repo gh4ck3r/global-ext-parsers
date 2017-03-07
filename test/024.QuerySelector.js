@@ -6,3 +6,9 @@ document.querySelector(`
     div.class-a
     div.class-b
 `);
+document.querySelector("#id-a");
+document.querySelector("div#id-a");
+
+document.getElementById("id-a");
+document.getElementsByClassName("class-a class-b");
+document.getElementsByName("name-a");
