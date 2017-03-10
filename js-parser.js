@@ -35,11 +35,9 @@ function tagJavaScript(aSourceCodes, aPath, aLineOffset = 0, aColumnOffset = 0) 
     ast = parseJS(aSourceCodes);
   } catch(e) {
     const {lineNumber, description} = e;
-    if (lineNumber && description) {
-      console.error(ANSI.red`Syntax Error: ${aPath} at line ${lineNumber} : ${description}`);
-    } else {
-      console.error(ANSI.red`${e}`);
-    }
+    console.error((lineNumber && description) ?
+      ANSI.red`Syntax Error: ${aPath} at line ${lineNumber + aLineOffset} : ${description}` :
+      ANSI.red`${e}`);
     process.exit(10);
   }
 
