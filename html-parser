@@ -52,16 +52,17 @@ const parser = new htmlparser.Parser({
       const src = javaScript.join('\n');
       if (src.trim().length) {
         const column = sources[lineBeginScript-1].indexOf(javaScript[0])+1;
-        console.log("Script :", curFile, lineBeginScript, column);
-        console.log(src);
         tagJavaScript(src, curFile, lineBeginScript, column);
-        // TODO : parse JavaScript
       }
       javaScript.length = 0;
     }
   },
   ontext(aText) {
     if (!inScript) return;
+    // FIXME : This is for a bug of htmlparser2
+    if (aText.startsWith('<')) {
+      aText = javaScript.pop() + aText;
+    }
     javaScript.push(aText);
   }
 }, {decodeEntities: true, lowerCaseAttributeNames: true});
