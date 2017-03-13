@@ -1,4 +1,4 @@
-# global-ext-parsers
+# gtags-parsers
 External parsers for customized GNU global
 
 # GNU Global
