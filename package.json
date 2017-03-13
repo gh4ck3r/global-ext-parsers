@@ -1,14 +1,18 @@
 {
-  "name": "global-ext-parsers",
-  "version": "1.0.0",
+  "name": "gtags-parsers",
+  "version": "0.1.0",
   "description": "External parser for customized GNU global source tagging system",
   "main": "index.js",
+  "bin" : {
+    "gtags-javascript": "gtags-javascript",
+    "gtags-html": "gtags-html"
+  },
   "scripts": {
     "test": "for sample in test/*.js;do echo Test $sample;if [ \"$(js-parser $sample)\" != \"$(cat $sample.expect)\" ];then echo Error on $sample;exit 1;fi; done;"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gh4ck3r/global-ext-parsers.git"
+    "url": "git+https://github.com/gh4ck3r/gtags-parsers.git"
   },
   "keywords": [
     "GNU",
@@ -18,14 +22,15 @@
     "cgtas",
     "exuberant",
     "parser",
-    "JavaScript"
+    "JavaScript",
+    "HTML"
   ],
   "author": "Changbin Park",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/gh4ck3r/global-ext-parsers/issues"
+    "url": "https://github.com/gh4ck3r/gtags-parsers/issues"
   },
-  "homepage": "https://github.com/gh4ck3r/global-ext-parsers#readme",
+  "homepage": "https://github.com/gh4ck3r/gtags-parsers#readme",
   "dependencies": {
     "ansi-string": "^0.1.1",
     "esprima": "^3.1.3",
