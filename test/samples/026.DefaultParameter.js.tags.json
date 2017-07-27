@@ -1,0 +1,42 @@
+[
+  {
+    "type": "D",
+    "name": "v",
+    "line": 4,
+    "column": 7,
+    "path": "./test/samples/026.DefaultParameter.js",
+    "ref": "const v = 'val';"
+  },
+  {
+    "type": "D",
+    "name": "foo",
+    "line": 5,
+    "column": 10,
+    "path": "./test/samples/026.DefaultParameter.js",
+    "ref": "function foo(a = v) { }"
+  },
+  {
+    "type": "R",
+    "name": "v",
+    "line": 5,
+    "column": 18,
+    "path": "./test/samples/026.DefaultParameter.js",
+    "ref": "function foo(a = v) { }"
+  },
+  {
+    "type": "D",
+    "name": "bar",
+    "line": 6,
+    "column": 10,
+    "path": "./test/samples/026.DefaultParameter.js",
+    "ref": "function bar(a = undefined) { }"
+  },
+  {
+    "type": "D",
+    "name": "baz",
+    "line": 7,
+    "column": 10,
+    "path": "./test/samples/026.DefaultParameter.js",
+    "ref": "function baz(a = null) { }"
+  }
+]

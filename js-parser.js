@@ -138,7 +138,6 @@ function determineTagType(aIdNode) {
     case 'FunctionExpression.id':
     case 'ImportNamespaceSpecifier.local':
     case 'LabeledStatement.label':
-      aIdNode.tag = DEF;
       return DEF;
 
     // Conditional definitions
@@ -187,6 +186,11 @@ function determineTagType(aIdNode) {
     }
     case 'ArrayPattern.elements': // An array-destructuring pattern.
       return DEF;
+    case 'AssignmentPattern.right':
+      if (name === 'undefined') {
+        return NOTHING;
+      }
+      return REF;
 
     // References
     case 'ArrayExpression.elements':
