@@ -4,9 +4,19 @@ const assert = require('assert');
 const path = require('path');
 const fs = require('fs');
 
-describe('js-parser extract expected tags from', function() {
-  const {tagJavaScriptFile} = require('..');
+const {tagJavaScriptFile, tagJavaScript} = require('..');
 
+describe('tagJavaScript', function() {
+  it('throws TypeError with empty source or path', function() {
+    const dummySrc = ';';
+    const dummyPath = '/path/to/source';
+    assert.throws(() => tagJavaScript('', dummyPath));
+    assert.throws(() => tagJavaScript(dummySrc, ''));
+    assert.doesNotThrow(() => tagJavaScript(dummySrc, dummyPath));
+  });
+});
+
+describe('js-parser extract expected tags from', function() {
   const sampleDir = 'test/samples';
   fs.readdirSync(sampleDir)
     .filter(f => f.endsWith('.js'))

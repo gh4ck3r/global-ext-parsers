@@ -11,9 +11,15 @@ if (sourceFiles.length === 0) {
   process.exit(1);
 }
 
+const ANSI = require('ansi-string');
 const {tagJavaScriptFile} = require('.');
 const {printTag} = require('./common.js');
 
 sourceFiles.forEach(async f => {
-  (await tagJavaScriptFile(f)).forEach(printTag);
+  try {
+    (await tagJavaScriptFile(f)).forEach(printTag);
+  } catch(e) {
+    if (!(e instanceof TypeError)) throw e;
+    console.warn(ANSI.red`[WARNING] ${f} is not a valid javascript or empty.`);
+  }
 });
