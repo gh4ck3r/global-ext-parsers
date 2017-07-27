@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 // vim:ft=javascript:ts=2:sw=2:et:
 
 /* global module, require, process */

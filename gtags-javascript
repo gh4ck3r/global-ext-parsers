@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 // vim:ft=javascript:ts=2:sw=2:et:
-"use strict";
+'use strict';
 
 const argv = process.argv.slice(2);
-const options = argv.filter(v => v.startsWith("--"));
+const options = argv.filter(v => v.startsWith('--'));
 
 const sourceFiles = argv.filter(v => !options.includes(v));
 if (sourceFiles.length === 0) {
-  console.warn(`No args`);
+  console.warn('No args');
   process.exit(1);
 }
 

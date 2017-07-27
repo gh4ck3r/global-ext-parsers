@@ -1,20 +1,20 @@
 // vim:ft=javascript:ts=2:sw=2:et:
-"use strict";
+'use strict';
 
 /* global module, require, process */
 
 const {readFile, exitWithError, printTag} = require('./common.js');
 
 const [DEBUG, VERBOSE, DUMPAST] = (function() {
-  const options = process.argv.slice(2).filter(v => v.startsWith("--"));
-  const debug = options.includes("--debug");
-  const verbose = debug && options.includes("--verbose");
-  const dumpast = debug && options.includes("--ast");
+  const options = process.argv.slice(2).filter(v => v.startsWith('--'));
+  const debug = options.includes('--debug');
+  const verbose = debug && options.includes('--verbose');
+  const dumpast = debug && options.includes('--ast');
   return [debug, verbose, dumpast];
 })();
 
 const esprima = require('esprima');
-const ANSI = require("ansi-string");
+const ANSI = require('ansi-string');
 
 module.exports = {
   tagJavaScript,
@@ -27,7 +27,7 @@ const NOTHING = 'N';
 
 function tagJavaScript(aSourceCodes, aPath, aLineOffset = 0, aColumnOffset = 0) {
   if (!aSourceCodes || !aPath) {
-    throw new TypeError("Source code and its path must be given.");
+    throw new TypeError('Source code and its path must be given.');
   }
 
   let ast;
@@ -59,30 +59,30 @@ function parseJS(aSourceCodes) {
     ast = esprima.parse(aSourceCodes, option);
     decorateAST(ast);
   } catch(e) {
-    option.sourceType = "module";
+    option.sourceType = 'module';
     ast = esprima.parse(aSourceCodes, option);
   }
   return ast;
 }
 
 function tagAST(aAST, aSourceCodes, aFile, aLineOffset = 0, aColumnOffset = 0) {
-  const sources = aSourceCodes.split("\n");
+  const sources = aSourceCodes.split('\n');
 
   if (DUMPAST) {
     ANSI.green.stderr();
-    console.log("Entire AST");
+    console.log('Entire AST');
     dump(aAST);
     ANSI.reset.stderr();
   }
 
   // https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey/Parser_API
-  for (const identifier of aAST.descendants("Identifier")) {
+  for (const identifier of aAST.descendants('Identifier')) {
     try {
       if (!identifier.tagType) {
         ANSI.red.stderr();
         const {tagInfo: {name, line, column}, path} = identifier;
         console.error(`Unknown Identifier : ${name} at ${aFile} ${line}:${column+1},${sources[line-1]}`);
-        console.error("  AST Path :", path);
+        console.error('  AST Path :', path);
         ANSI.reset.stderr();
       }
 
@@ -94,18 +94,18 @@ function tagAST(aAST, aSourceCodes, aFile, aLineOffset = 0, aColumnOffset = 0) {
         tagInfo.column += 1 + aColumnOffset;
         printTag(tagInfo);
         if (DEBUG) {
-          console.log(ANSI.yellow("    AST Path :", identifier.path));
+          console.log(ANSI.yellow('    AST Path :', identifier.path));
         }
       }
     } catch(e) {
       if (DEBUG) {
         ANSI.red.stderr();
-        console.error("===============================");
-        console.error("aFile:", aFile);
-        console.error("AST Path :", identifier.path);
-        console.error("-------------------------------");
+        console.error('===============================');
+        console.error('aFile:', aFile);
+        console.error('AST Path :', identifier.path);
+        console.error('-------------------------------');
         console.error(e);
-        console.error("===============================");
+        console.error('===============================');
         ANSI.reset.stderr();
       }
       throw e;
@@ -115,7 +115,7 @@ function tagAST(aAST, aSourceCodes, aFile, aLineOffset = 0, aColumnOffset = 0) {
 
 function determineTagType(aIdNode) {
   const {type, name} = aIdNode;
-  if (type !== "Identifier") return NOTHING;
+  if (type !== 'Identifier') return NOTHING;
 
   const {parentNode, parentProp} = (function getNonArrayParent() {
     let {parentNode, parentProp} = aIdNode;
@@ -128,113 +128,113 @@ function determineTagType(aIdNode) {
 
   switch(`${parentNode.type}.${parentProp}`) {
     // Definitions
-    case "ClassDeclaration.id":
-    case "ConditionalExpression.consequent":
-    case "ExportDefaultDeclaration.declaration":
-    case "FunctionDeclaration.id":
-    case "FunctionExpression.id":
-    case "ImportNamespaceSpecifier.local":
-    case "LabeledStatement.label":
+    case 'ClassDeclaration.id':
+    case 'ConditionalExpression.consequent':
+    case 'ExportDefaultDeclaration.declaration':
+    case 'FunctionDeclaration.id':
+    case 'FunctionExpression.id':
+    case 'ImportNamespaceSpecifier.local':
+    case 'LabeledStatement.label':
       aIdNode.tag = DEF;
       return DEF;
 
     // Conditional definitions
-    case "ExportSpecifier.exported":        // export { foo, bar, baz}
+    case 'ExportSpecifier.exported':        // export { foo, bar, baz}
       return parentNode.local.name === name ? NOTHING : DEF;
-    case "MethodDefinition.key":
-      return name === "constructor" ? NOTHING : DEF;
-    case "ImportSpecifier.local":
+    case 'MethodDefinition.key':
+      return name === 'constructor' ? NOTHING : DEF;
+    case 'ImportSpecifier.local':
       return parentNode.imported.name !== name ? DEF : REF;
-    case "Property.key":
+    case 'Property.key':
       if (parentNode.shorthand) {
         // shorthand is always reference
-        // It'll reported as REF by "Property.value"
+        // It'll reported as REF by 'Property.value'
         return NOTHING;
       } else {
-        const [ ancestorNode, prop ] = aIdNode.getAncestor("VariableDeclarator");
+        const [ ancestorNode, prop ] = aIdNode.getAncestor('VariableDeclarator');
         if (ancestorNode) {
           switch (prop) {
-            case "init":
+            case 'init':
               if (parentNode.key !== parentNode.value) return DEF;  // for variable declara
               break;
-            case "id":
+            case 'id':
               if (parentNode.key === parentNode.value) return DEF;  // for variable declara
               break;
           }
         }
       }
       return REF;
-    case "VariableDeclarator.id": {
-      let [ ancestorNode, prop ] = aIdNode.getAncestor("ForInStatement");
-      if (ancestorNode && prop === "left") return NOTHING;
-      [ ancestorNode, prop ] = aIdNode.getAncestor("ForStatement");
-      if (ancestorNode && prop === "init") return NOTHING;
+    case 'VariableDeclarator.id': {
+      let [ ancestorNode, prop ] = aIdNode.getAncestor('ForInStatement');
+      if (ancestorNode && prop === 'left') return NOTHING;
+      [ ancestorNode, prop ] = aIdNode.getAncestor('ForStatement');
+      if (ancestorNode && prop === 'init') return NOTHING;
       return DEF;
     }
-    case "BinaryExpression.left":
-    case "BinaryExpression.right":
-    case "UpdateExpression.argument":
-    case "UnaryExpression.argument": {
+    case 'BinaryExpression.left':
+    case 'BinaryExpression.right':
+    case 'UpdateExpression.argument':
+    case 'UnaryExpression.argument': {
       if (isForStatementInternalId(aIdNode)) return NOTHING;
       return REF;
     }
-    case "ForStatement.update": {
+    case 'ForStatement.update': {
       if (isForStatementDefinedVariable(parentNode, name)) return NOTHING;
       return REF;
     }
-    case "ArrayPattern.elements": // An array-destructuring pattern.
+    case 'ArrayPattern.elements': // An array-destructuring pattern.
       return DEF;
 
     // References
-    case "ArrayExpression.elements":
-    case "ArrowFunctionExpression.body":
-    case "AssignmentExpression.right":
-    case "BreakStatement.label":
-    case "CallExpression.arguments":
-    case "CallExpression.callee":
-    case "ClassDeclaration.superClass":
-    case "ConditionalExpression.alternate":
-    case "ConditionalExpression.test":
-    case "ContinueStatement.label":
-    case "DoWhileStatement.test":
-    case "ForInStatement.right":
-    case "ForOfStatement.right":
-    case "ForStatement.test":
-    case "IfStatement.test":
-    case "ImportDefaultSpecifier.local":
-    case "ImportSpecifier.imported":
-    case "LogicalExpression.left":
-    case "LogicalExpression.right":
-    case "MemberExpression.object":
-    case "MemberExpression.property":
-    case "NewExpression.arguments":
-    case "NewExpression.callee":
-    case "Property.value":
-    case "ReturnStatement.argument":
-    case "SequenceExpression.expressions":
-    case "SpreadElement.argument":
-    case "SwitchCase.test":
-    case "SwitchStatement.discriminant":
-    case "TaggedTemplateExpression.tag":
-    case "TemplateLiteral.expressions":
-    case "ThrowStatement.argument":
-    case "VariableDeclarator.init":
-    case "WhileStatement.test":
-    case "YieldExpression.argument":
-    case "ExpressionStatement.expression":
+    case 'ArrayExpression.elements':
+    case 'ArrowFunctionExpression.body':
+    case 'AssignmentExpression.right':
+    case 'BreakStatement.label':
+    case 'CallExpression.arguments':
+    case 'CallExpression.callee':
+    case 'ClassDeclaration.superClass':
+    case 'ConditionalExpression.alternate':
+    case 'ConditionalExpression.test':
+    case 'ContinueStatement.label':
+    case 'DoWhileStatement.test':
+    case 'ForInStatement.right':
+    case 'ForOfStatement.right':
+    case 'ForStatement.test':
+    case 'IfStatement.test':
+    case 'ImportDefaultSpecifier.local':
+    case 'ImportSpecifier.imported':
+    case 'LogicalExpression.left':
+    case 'LogicalExpression.right':
+    case 'MemberExpression.object':
+    case 'MemberExpression.property':
+    case 'NewExpression.arguments':
+    case 'NewExpression.callee':
+    case 'Property.value':
+    case 'ReturnStatement.argument':
+    case 'SequenceExpression.expressions':
+    case 'SpreadElement.argument':
+    case 'SwitchCase.test':
+    case 'SwitchStatement.discriminant':
+    case 'TaggedTemplateExpression.tag':
+    case 'TemplateLiteral.expressions':
+    case 'ThrowStatement.argument':
+    case 'VariableDeclarator.init':
+    case 'WhileStatement.test':
+    case 'YieldExpression.argument':
+    case 'ExpressionStatement.expression':
       return REF;
 
     // Ignored symbols
-    case "ArrowFunctionExpression.params":  // Locally defined
-    case "AssignmentExpression.left":       // This is just assignment
-    case "AssignmentPattern.left":
-    case "CatchClause.param":
-    case "ExportSpecifier.local":
-    case "ForInStatement.left":
-    case "ForOfStatement.left":             // "b" of "for (b of buffer)"
-    case "FunctionExpression.params":       // Locally defined
-    case "RestElement.argument":
-    case "FunctionDeclaration.params":
+    case 'ArrowFunctionExpression.params':  // Locally defined
+    case 'AssignmentExpression.left':       // This is just assignment
+    case 'AssignmentPattern.left':
+    case 'CatchClause.param':
+    case 'ExportSpecifier.local':
+    case 'ForInStatement.left':
+    case 'ForOfStatement.left':             // 'b' of 'for (b of buffer)'
+    case 'FunctionExpression.params':       // Locally defined
+    case 'RestElement.argument':
+    case 'FunctionDeclaration.params':
       return NOTHING;
 
     // Possibly verbose definition from here
@@ -246,32 +246,33 @@ function *subAstNodeProps(aAstNode) {
   if (!(isNode(aAstNode) || aAstNode instanceof Array)) return;
   for (let prop in aAstNode) {
     switch(prop) {
-      case "type":
-      case "loc":
+      case 'type':
+      case 'loc':
         break;
-      case "errors":
+      case 'errors':
         if (VERBOSE) {  // XXX : This spits out import export statement as error
           ANSI.red.stderr();
-          console.error("==========================================");
-          console.error("aAstNode.error : ", aAstNode.errors[0]);
+          console.error('==========================================');
+          console.error('aAstNode.error : ', aAstNode.errors[0]);
           dump(aAstNode.errors[0]);
-          console.error("------------------------------------------");
-          console.error("aAstNode: ", aAstNode);
-          console.error("==========================================");
+          console.error('------------------------------------------');
+          console.error('aAstNode: ', aAstNode);
+          console.error('==========================================');
           ANSI.reset.stderr();
         }
         break;
-      default:
+      default: {
         const subAST = aAstNode[prop];
         if (isNode(subAST) || subAST instanceof Array) {
           yield prop;
         }
         break;
+      }
     }
   }
 }
 
-// interface Node always have "type" property
+// interface Node always have 'type' property
 function isNode(aObj) {
   return aObj instanceof Object && aObj.hasOwnProperty('type');
 }
@@ -283,22 +284,22 @@ function dump(aObj) {
 // XXX : Think about make this a hidden method of ForStatement node
 function isForStatementDefinedVariable(aForStatementNode, aName) {
   const {type, init} = aForStatementNode;
-  console.assert(type === "ForStatement");
+  console.assert(type === 'ForStatement');
 
   return  init &&
-          init.type === "VariableDeclaration" &&
+          init.type === 'VariableDeclaration' &&
           init.declarations
-              .filter(e => e.type === "VariableDeclarator")
-              .some(e => {
-                const {id :{type, name}} = e;
-                return type === "Identifier" && name === aName;
-              });
+            .filter(e => e.type === 'VariableDeclarator')
+            .some(e => {
+              const {id :{type, name}} = e;
+              return type === 'Identifier' && name === aName;
+            });
 }
 
 function isForStatementInternalId(aIdNode) {
-  const [ ancestorNode, prop ] = aIdNode.getAncestor("ForStatement");
+  const [ ancestorNode, prop ] = aIdNode.getAncestor('ForStatement');
   return ancestorNode &&
-      ["test", "update"].includes(prop) &&
+      ['test', 'update'].includes(prop) &&
       isForStatementDefinedVariable(ancestorNode, aIdNode.name);
 }
 
@@ -309,7 +310,7 @@ function decorateAST(aAstNode) {
     path: {get: pathGetter},
     tagType: {configurable: true, get: function() { // lazyLoader
       const value = determineTagType(this);
-      Object.defineProperty(this, "tagType", {value});
+      Object.defineProperty(this, 'tagType', {value});
       return value;
     }},
     tagInfo: {get: function() {
@@ -322,6 +323,7 @@ function decorateAST(aAstNode) {
         case DEF:
         case REF:
           yield this;
+          // fall through
         case NOTHING:
           break;
         default:
@@ -329,20 +331,20 @@ function decorateAST(aAstNode) {
       }
 
       const selectors = [
-        "querySelector",
-        "querySelectorAll",
-        "getElementById",
-        "getElementsByClassName",
-        "getElementsByName",
+        'querySelector',
+        'querySelectorAll',
+        'getElementById',
+        'getElementsByClassName',
+        'getElementsByName',
       ];
-      if (selectors.includes(name) && parentNode.type === "MemberExpression") {
+      if (selectors.includes(name) && parentNode.type === 'MemberExpression') {
         let callExpression = parentNode;
-        while(callExpression.type === "MemberExpression")
+        while(callExpression.type === 'MemberExpression')
           callExpression = callExpression.parentNode;
-        if (callExpression.type === "CallExpression") {
+        if (callExpression.type === 'CallExpression') {
           const selector = callExpression.arguments[0];
-          if (["Literal", "TemplateLiteral"].includes(selector.type)) {
-            yield *tagInfoFromLiteral(selector, name.startsWith("querySelector"));
+          if (['Literal', 'TemplateLiteral'].includes(selector.type)) {
+            yield *tagInfoFromLiteral(selector, name.startsWith('querySelector'));
           }
         }
       }
@@ -352,7 +354,7 @@ function decorateAST(aAstNode) {
   for (let prop of subAstNodeProps(aAstNode)) {
     // There's a node that belongs to other parent nodes with other property
     // names. For such a case clone it with Object.assign()
-    if (aAstNode[prop].hasOwnProperty("parentNode")) {
+    if (aAstNode[prop].hasOwnProperty('parentNode')) {
       aAstNode[prop] = Object.assign({}, aAstNode[prop]);
     }
     const subAST = aAstNode[prop];
@@ -387,9 +389,7 @@ function decorateAST(aAstNode) {
 
   function pathGetter() {
     const path = [];
-    for (let n = this;  // jshint ignore:line
-        n.parentNode;
-        n = n.parentNode) {
+    for (let n = this; n.parentNode; n = n.parentNode) {
       const {parentNode, parentProp} = n;
       if (parentNode instanceof Array) {
         path.unshift(`[${parentProp}]`);
@@ -404,11 +404,11 @@ function decorateAST(aAstNode) {
 function* tagInfoFromLiteral(aLiteralNode, isSelector = false) {
   const {value, line, column} = (function(){
     switch(aLiteralNode.type) {
-      case "Literal": {
+      case 'Literal': {
         const {value, loc:{start:{line, column}}} = aLiteralNode;
         return {value, line, column};
       }
-      case "TemplateLiteral": {
+      case 'TemplateLiteral': {
         const {value: {raw: value}, loc:{start:{line, column}}} =
           aLiteralNode.quasis[0];
         return {value, line, column};
@@ -416,15 +416,15 @@ function* tagInfoFromLiteral(aLiteralNode, isSelector = false) {
     }
   })();
 
-  const idPtrn = isSelector ? /[\.#]\b[\w-]+\b/g : /\b[\w-]+\b/g;
+  const idPtrn = isSelector ? /[.#]\b[\w-]+\b/g : /\b[\w-]+\b/g;
   const ids = value.match(idPtrn);
   if (ids) {
     for (const id of ids) {
       const splitStrings = value.split('\n');
       let nLineOffset = 0, nColOffset;
       for (nColOffset = splitStrings[nLineOffset].indexOf(id);
-          nColOffset === -1;
-          nColOffset = splitStrings[++nLineOffset].indexOf(id));
+        nColOffset === -1;
+        nColOffset = splitStrings[++nLineOffset].indexOf(id));
       const prefixLen = isSelector ? 1 : 0;
       yield { tagInfo: {
         type: REF,
