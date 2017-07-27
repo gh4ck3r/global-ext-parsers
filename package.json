@@ -2,13 +2,13 @@
   "name": "gtags-parsers",
   "version": "0.1.0",
   "description": "External parser for customized GNU global source tagging system",
-  "main": "index.js",
+  "main": "js-parser.js",
   "bin": {
     "gtags-javascript": "gtags-javascript",
     "gtags-html": "gtags-html"
   },
   "scripts": {
-    "test": "for sample in test/*.js;do echo Test $sample;if [ \"$(js-parser $sample)\" != \"$(cat $sample.expect)\" ];then echo Error on $sample;exit 1;fi; done;"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -35,5 +35,8 @@
     "ansi-string": "^0.1.1",
     "esprima": "^4.0.0",
     "htmlparser2": "^3.9.2"
+  },
+  "devDependencies": {
+    "mocha": "^3.4.2"
   }
 }
