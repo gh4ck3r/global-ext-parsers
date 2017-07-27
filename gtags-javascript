@@ -11,5 +11,9 @@ if (sourceFiles.length === 0) {
   process.exit(1);
 }
 
-const {tagJavaScriptFile} = require('./js-parser.js');
-sourceFiles.forEach(tagJavaScriptFile);
+const {tagJavaScriptFile} = require('.');
+const {printTag} = require('./common.js');
+
+sourceFiles.forEach(async f => {
+  (await tagJavaScriptFile(f)).forEach(printTag);
+});

@@ -3,7 +3,7 @@
 
 /* global module, require, process */
 
-const {readFile, exitWithError, printTag} = require('./common.js');
+const {readFile, exitWithError} = require('./common.js');
 
 const [DEBUG, VERBOSE, DUMPAST] = (function() {
   const options = process.argv.slice(2).filter(v => v.startsWith('--'));
@@ -41,13 +41,11 @@ function tagJavaScript(aSourceCodes, aPath, aLineOffset = 0, aColumnOffset = 0) 
     process.exit(10);
   }
 
-  if (ast) {
-    tagAST(ast, aSourceCodes, aPath, aLineOffset, aColumnOffset);
-  }
+  return tagAST(ast, aSourceCodes, aPath, aLineOffset, aColumnOffset);
 }
 
 function tagJavaScriptFile(aPath) {
-  readFile(aPath)
+  return readFile(aPath)
     .catch(exitWithError)
     .then(src => tagJavaScript(src, aPath));
 }
@@ -66,6 +64,9 @@ function parseJS(aSourceCodes) {
 }
 
 function tagAST(aAST, aSourceCodes, aFile, aLineOffset = 0, aColumnOffset = 0) {
+  const tags = [];
+  if (!aAST) return tags;
+
   const sources = aSourceCodes.split('\n');
 
   if (DUMPAST) {
@@ -92,7 +93,7 @@ function tagAST(aAST, aSourceCodes, aFile, aLineOffset = 0, aColumnOffset = 0) {
         tagInfo.ref     = sources[tagInfo.line-1];
         tagInfo.line   += aLineOffset;
         tagInfo.column += 1 + aColumnOffset;
-        printTag(tagInfo);
+        tags.push(tagInfo);
         if (DEBUG) {
           console.log(ANSI.yellow('    AST Path :', identifier.path));
         }
@@ -111,6 +112,8 @@ function tagAST(aAST, aSourceCodes, aFile, aLineOffset = 0, aColumnOffset = 0) {
       throw e;
     }
   }
+
+  return tags;
 }
 
 function determineTagType(aIdNode) {
