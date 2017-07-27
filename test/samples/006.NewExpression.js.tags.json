@@ -1,0 +1,10 @@
+[
+  {
+    "type": "R",
+    "name": "Promise",
+    "line": 2,
+    "column": 5,
+    "path": "./test/samples/006.NewExpression.js",
+    "ref": "new Promise((res, rej) => {});"
+  }
+]

@@ -1,5 +1,0 @@
-D,option,test/008.Property.js,2:7,const option = {loc: true};
-D,loc,test/008.Property.js,2:17,const option = {loc: true};
-D,option2,test/008.Property.js,3:7,const option2 = {loc: option};
-D,loc,test/008.Property.js,3:18,const option2 = {loc: option};
-R,option,test/008.Property.js,3:23,const option2 = {loc: option};

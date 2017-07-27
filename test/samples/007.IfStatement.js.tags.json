@@ -1,0 +1,10 @@
+[
+  {
+    "type": "R",
+    "name": "cond",
+    "line": 2,
+    "column": 5,
+    "path": "./test/samples/007.IfStatement.js",
+    "ref": "if (cond);"
+  }
+]

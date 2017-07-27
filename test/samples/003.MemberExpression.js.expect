@@ -1,4 +1,0 @@
-D,sourceFiles,test/003.MemberExpression.js,2:7,const sourceFiles = process.argv.slice(2);
-R,process,test/003.MemberExpression.js,2:21,const sourceFiles = process.argv.slice(2);
-R,argv,test/003.MemberExpression.js,2:29,const sourceFiles = process.argv.slice(2);
-R,slice,test/003.MemberExpression.js,2:34,const sourceFiles = process.argv.slice(2);

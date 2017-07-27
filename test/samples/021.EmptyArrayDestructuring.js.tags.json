@@ -1,0 +1,58 @@
+[
+  {
+    "type": "D",
+    "name": "first",
+    "line": 2,
+    "column": 8,
+    "path": "./test/samples/021.EmptyArrayDestructuring.js",
+    "ref": "const [first, ,third] = [1, 2 ,3];"
+  },
+  {
+    "type": "D",
+    "name": "third",
+    "line": 2,
+    "column": 16,
+    "path": "./test/samples/021.EmptyArrayDestructuring.js",
+    "ref": "const [first, ,third] = [1, 2 ,3];"
+  },
+  {
+    "type": "R",
+    "name": "p1",
+    "line": 3,
+    "column": 8,
+    "path": "./test/samples/021.EmptyArrayDestructuring.js",
+    "ref": "const {p1, p3} ="
+  },
+  {
+    "type": "R",
+    "name": "p3",
+    "line": 3,
+    "column": 12,
+    "path": "./test/samples/021.EmptyArrayDestructuring.js",
+    "ref": "const {p1, p3} ="
+  },
+  {
+    "type": "D",
+    "name": "p1",
+    "line": 4,
+    "column": 4,
+    "path": "./test/samples/021.EmptyArrayDestructuring.js",
+    "ref": "  {p1: 1, p2: 2, p3: 3};"
+  },
+  {
+    "type": "D",
+    "name": "p2",
+    "line": 4,
+    "column": 11,
+    "path": "./test/samples/021.EmptyArrayDestructuring.js",
+    "ref": "  {p1: 1, p2: 2, p3: 3};"
+  },
+  {
+    "type": "D",
+    "name": "p3",
+    "line": 4,
+    "column": 18,
+    "path": "./test/samples/021.EmptyArrayDestructuring.js",
+    "ref": "  {p1: 1, p2: 2, p3: 3};"
+  }
+]

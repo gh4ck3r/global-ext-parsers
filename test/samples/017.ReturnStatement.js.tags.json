@@ -1,0 +1,18 @@
+[
+  {
+    "type": "D",
+    "name": "foo",
+    "line": 2,
+    "column": 10,
+    "path": "./test/samples/017.ReturnStatement.js",
+    "ref": "function foo(){ return bar; }"
+  },
+  {
+    "type": "R",
+    "name": "bar",
+    "line": 2,
+    "column": 24,
+    "path": "./test/samples/017.ReturnStatement.js",
+    "ref": "function foo(){ return bar; }"
+  }
+]

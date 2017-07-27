@@ -1,0 +1,18 @@
+[
+  {
+    "type": "D",
+    "name": "gen",
+    "line": 1,
+    "column": 11,
+    "path": "./test/samples/022.YieldExpression.js",
+    "ref": "function *gen() {yield val;}"
+  },
+  {
+    "type": "R",
+    "name": "val",
+    "line": 1,
+    "column": 24,
+    "path": "./test/samples/022.YieldExpression.js",
+    "ref": "function *gen() {yield val;}"
+  }
+]

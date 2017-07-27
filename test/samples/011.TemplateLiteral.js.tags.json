@@ -1,0 +1,26 @@
+[
+  {
+    "type": "R",
+    "name": "console",
+    "line": 2,
+    "column": 1,
+    "path": "./test/samples/011.TemplateLiteral.js",
+    "ref": "console.error(`${aError}`);"
+  },
+  {
+    "type": "R",
+    "name": "error",
+    "line": 2,
+    "column": 9,
+    "path": "./test/samples/011.TemplateLiteral.js",
+    "ref": "console.error(`${aError}`);"
+  },
+  {
+    "type": "R",
+    "name": "aError",
+    "line": 2,
+    "column": 18,
+    "path": "./test/samples/011.TemplateLiteral.js",
+    "ref": "console.error(`${aError}`);"
+  }
+]

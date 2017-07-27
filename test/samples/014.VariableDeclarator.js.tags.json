@@ -1,0 +1,58 @@
+[
+  {
+    "type": "R",
+    "name": "type",
+    "line": 2,
+    "column": 8,
+    "path": "./test/samples/014.VariableDeclarator.js",
+    "ref": "const {type, name, loc: {start: {line, column}}} = aAST;"
+  },
+  {
+    "type": "R",
+    "name": "name",
+    "line": 2,
+    "column": 14,
+    "path": "./test/samples/014.VariableDeclarator.js",
+    "ref": "const {type, name, loc: {start: {line, column}}} = aAST;"
+  },
+  {
+    "type": "R",
+    "name": "loc",
+    "line": 2,
+    "column": 20,
+    "path": "./test/samples/014.VariableDeclarator.js",
+    "ref": "const {type, name, loc: {start: {line, column}}} = aAST;"
+  },
+  {
+    "type": "R",
+    "name": "start",
+    "line": 2,
+    "column": 26,
+    "path": "./test/samples/014.VariableDeclarator.js",
+    "ref": "const {type, name, loc: {start: {line, column}}} = aAST;"
+  },
+  {
+    "type": "R",
+    "name": "line",
+    "line": 2,
+    "column": 34,
+    "path": "./test/samples/014.VariableDeclarator.js",
+    "ref": "const {type, name, loc: {start: {line, column}}} = aAST;"
+  },
+  {
+    "type": "R",
+    "name": "column",
+    "line": 2,
+    "column": 40,
+    "path": "./test/samples/014.VariableDeclarator.js",
+    "ref": "const {type, name, loc: {start: {line, column}}} = aAST;"
+  },
+  {
+    "type": "R",
+    "name": "aAST",
+    "line": 2,
+    "column": 52,
+    "path": "./test/samples/014.VariableDeclarator.js",
+    "ref": "const {type, name, loc: {start: {line, column}}} = aAST;"
+  }
+]

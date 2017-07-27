@@ -1,0 +1,42 @@
+[
+  {
+    "type": "D",
+    "name": "option",
+    "line": 2,
+    "column": 7,
+    "path": "./test/samples/008.Property.js",
+    "ref": "const option = {loc: true};"
+  },
+  {
+    "type": "D",
+    "name": "loc",
+    "line": 2,
+    "column": 17,
+    "path": "./test/samples/008.Property.js",
+    "ref": "const option = {loc: true};"
+  },
+  {
+    "type": "D",
+    "name": "option2",
+    "line": 3,
+    "column": 7,
+    "path": "./test/samples/008.Property.js",
+    "ref": "const option2 = {loc: option};"
+  },
+  {
+    "type": "D",
+    "name": "loc",
+    "line": 3,
+    "column": 18,
+    "path": "./test/samples/008.Property.js",
+    "ref": "const option2 = {loc: option};"
+  },
+  {
+    "type": "R",
+    "name": "option",
+    "line": 3,
+    "column": 23,
+    "path": "./test/samples/008.Property.js",
+    "ref": "const option2 = {loc: option};"
+  }
+]

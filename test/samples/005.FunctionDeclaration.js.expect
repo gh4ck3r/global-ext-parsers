@@ -1,1 +1,0 @@
-D,Foo,test/005.FunctionDeclaration.js,2:10,function Foo(arg1, arg2) { "function body"; }

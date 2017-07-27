@@ -1,0 +1,10 @@
+[
+  {
+    "type": "R",
+    "name": "window",
+    "line": 2,
+    "column": 8,
+    "path": "./test/samples/018.UnaryExpression.js",
+    "ref": "typeof window;"
+  }
+]

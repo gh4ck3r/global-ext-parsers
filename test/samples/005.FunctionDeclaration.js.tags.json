@@ -1,0 +1,10 @@
+[
+  {
+    "type": "D",
+    "name": "Foo",
+    "line": 2,
+    "column": 10,
+    "path": "./test/samples/005.FunctionDeclaration.js",
+    "ref": "function Foo(arg1, arg2) { \"function body\"; }"
+  }
+]

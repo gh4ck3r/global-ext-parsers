@@ -1,0 +1,10 @@
+[
+  {
+    "type": "D",
+    "name": "parseAST",
+    "line": 2,
+    "column": 10,
+    "path": "./test/samples/013.AssignmentPattern.js",
+    "ref": "function parseAST(aAST, aParent = null) {}"
+  }
+]

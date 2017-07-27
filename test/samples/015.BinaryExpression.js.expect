@@ -1,2 +1,0 @@
-R,foo,test/015.BinaryExpression.js,2:5,if (foo === bar);
-R,bar,test/015.BinaryExpression.js,2:13,if (foo === bar);

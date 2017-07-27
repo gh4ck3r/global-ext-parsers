@@ -1,0 +1,10 @@
+[
+  {
+    "type": "D",
+    "name": "foo",
+    "line": 2,
+    "column": 10,
+    "path": "./test/samples/012.FunctionExpression.js",
+    "ref": "function foo() { return function(param) {}; }"
+  }
+]

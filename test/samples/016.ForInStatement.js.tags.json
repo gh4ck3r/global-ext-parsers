@@ -1,0 +1,10 @@
+[
+  {
+    "type": "R",
+    "name": "aAST",
+    "line": 2,
+    "column": 18,
+    "path": "./test/samples/016.ForInStatement.js",
+    "ref": "for (let prop in aAST);"
+  }
+]

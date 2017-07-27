@@ -1,0 +1,18 @@
+[
+  {
+    "type": "R",
+    "name": "foo",
+    "line": 2,
+    "column": 5,
+    "path": "./test/samples/015.BinaryExpression.js",
+    "ref": "if (foo === bar);"
+  },
+  {
+    "type": "R",
+    "name": "bar",
+    "line": 2,
+    "column": 13,
+    "path": "./test/samples/015.BinaryExpression.js",
+    "ref": "if (foo === bar);"
+  }
+]

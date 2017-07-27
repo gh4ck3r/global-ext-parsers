@@ -1,0 +1,18 @@
+[
+  {
+    "type": "R",
+    "name": "a",
+    "line": 2,
+    "column": 1,
+    "path": "./test/samples/019.SequenceExpression.js",
+    "ref": "a,b;"
+  },
+  {
+    "type": "R",
+    "name": "b",
+    "line": 2,
+    "column": 3,
+    "path": "./test/samples/019.SequenceExpression.js",
+    "ref": "a,b;"
+  }
+]

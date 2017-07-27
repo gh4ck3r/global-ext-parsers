@@ -1,0 +1,42 @@
+[
+  {
+    "type": "D",
+    "name": "ast",
+    "line": 2,
+    "column": 5,
+    "path": "./test/samples/009.AssignmentExpression.js",
+    "ref": "let ast;"
+  },
+  {
+    "type": "R",
+    "name": "esprima",
+    "line": 3,
+    "column": 7,
+    "path": "./test/samples/009.AssignmentExpression.js",
+    "ref": "ast = esprima.parse(aSourceCode, option);"
+  },
+  {
+    "type": "R",
+    "name": "parse",
+    "line": 3,
+    "column": 15,
+    "path": "./test/samples/009.AssignmentExpression.js",
+    "ref": "ast = esprima.parse(aSourceCode, option);"
+  },
+  {
+    "type": "R",
+    "name": "aSourceCode",
+    "line": 3,
+    "column": 21,
+    "path": "./test/samples/009.AssignmentExpression.js",
+    "ref": "ast = esprima.parse(aSourceCode, option);"
+  },
+  {
+    "type": "R",
+    "name": "option",
+    "line": 3,
+    "column": 34,
+    "path": "./test/samples/009.AssignmentExpression.js",
+    "ref": "ast = esprima.parse(aSourceCode, option);"
+  }
+]

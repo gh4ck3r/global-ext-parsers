@@ -1,0 +1,10 @@
+[
+  {
+    "type": "D",
+    "name": "func",
+    "line": 2,
+    "column": 7,
+    "path": "./test/samples/004.ArrowFunctionExpression.js",
+    "ref": "const func = param => \"body\";"
+  }
+]

@@ -1,2 +1,0 @@
-D,foo,test/017.ReturnStatement.js,2:10,function foo(){ return bar; }
-R,bar,test/017.ReturnStatement.js,2:24,function foo(){ return bar; }

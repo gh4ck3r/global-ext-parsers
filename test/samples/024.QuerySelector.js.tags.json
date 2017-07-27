@@ -1,0 +1,314 @@
+[
+  {
+    "type": "R",
+    "name": "document",
+    "line": 2,
+    "column": 1,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelector(\"div.class-a\");"
+  },
+  {
+    "type": "R",
+    "name": "querySelector",
+    "line": 2,
+    "column": 10,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelector(\"div.class-a\");"
+  },
+  {
+    "type": "R",
+    "line": 2,
+    "column": 29,
+    "name": "class-a",
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelector(\"div.class-a\");"
+  },
+  {
+    "type": "R",
+    "name": "document",
+    "line": 3,
+    "column": 1,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelector(\"div.class-a.class-b\");"
+  },
+  {
+    "type": "R",
+    "name": "querySelector",
+    "line": 3,
+    "column": 10,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelector(\"div.class-a.class-b\");"
+  },
+  {
+    "type": "R",
+    "line": 3,
+    "column": 29,
+    "name": "class-a",
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelector(\"div.class-a.class-b\");"
+  },
+  {
+    "type": "R",
+    "line": 3,
+    "column": 37,
+    "name": "class-b",
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelector(\"div.class-a.class-b\");"
+  },
+  {
+    "type": "R",
+    "name": "document",
+    "line": 4,
+    "column": 1,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelector(\"div.user-panel.main input[name=login]\");"
+  },
+  {
+    "type": "R",
+    "name": "querySelector",
+    "line": 4,
+    "column": 10,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelector(\"div.user-panel.main input[name=login]\");"
+  },
+  {
+    "type": "R",
+    "line": 4,
+    "column": 29,
+    "name": "user-panel",
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelector(\"div.user-panel.main input[name=login]\");"
+  },
+  {
+    "type": "R",
+    "line": 4,
+    "column": 40,
+    "name": "main",
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelector(\"div.user-panel.main input[name=login]\");"
+  },
+  {
+    "type": "R",
+    "name": "document",
+    "line": 5,
+    "column": 1,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelector(`"
+  },
+  {
+    "type": "R",
+    "name": "querySelector",
+    "line": 5,
+    "column": 10,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelector(`"
+  },
+  {
+    "type": "R",
+    "line": 6,
+    "column": 9,
+    "name": "class-a",
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "    div.class-a"
+  },
+  {
+    "type": "R",
+    "line": 7,
+    "column": 9,
+    "name": "class-b",
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "    div.class-b"
+  },
+  {
+    "type": "R",
+    "name": "document",
+    "line": 9,
+    "column": 1,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelector(\"#id-a\");"
+  },
+  {
+    "type": "R",
+    "name": "querySelector",
+    "line": 9,
+    "column": 10,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelector(\"#id-a\");"
+  },
+  {
+    "type": "R",
+    "line": 9,
+    "column": 26,
+    "name": "id-a",
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelector(\"#id-a\");"
+  },
+  {
+    "type": "R",
+    "name": "document",
+    "line": 10,
+    "column": 1,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelector(\"div#id-a\");"
+  },
+  {
+    "type": "R",
+    "name": "querySelector",
+    "line": 10,
+    "column": 10,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelector(\"div#id-a\");"
+  },
+  {
+    "type": "R",
+    "line": 10,
+    "column": 29,
+    "name": "id-a",
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelector(\"div#id-a\");"
+  },
+  {
+    "type": "R",
+    "name": "document",
+    "line": 12,
+    "column": 1,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelectorAll(\"div.class-a\");"
+  },
+  {
+    "type": "R",
+    "name": "querySelectorAll",
+    "line": 12,
+    "column": 10,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelectorAll(\"div.class-a\");"
+  },
+  {
+    "type": "R",
+    "line": 12,
+    "column": 32,
+    "name": "class-a",
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelectorAll(\"div.class-a\");"
+  },
+  {
+    "type": "R",
+    "name": "document",
+    "line": 13,
+    "column": 1,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelectorAll(\"*\");"
+  },
+  {
+    "type": "R",
+    "name": "querySelectorAll",
+    "line": 13,
+    "column": 10,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelectorAll(\"*\");"
+  },
+  {
+    "type": "R",
+    "name": "document",
+    "line": 14,
+    "column": 1,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelectorAll(`${classes}`);"
+  },
+  {
+    "type": "R",
+    "name": "querySelectorAll",
+    "line": 14,
+    "column": 10,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelectorAll(`${classes}`);"
+  },
+  {
+    "type": "R",
+    "name": "classes",
+    "line": 14,
+    "column": 30,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.querySelectorAll(`${classes}`);"
+  },
+  {
+    "type": "R",
+    "name": "document",
+    "line": 16,
+    "column": 1,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.getElementById(\"id-a\");"
+  },
+  {
+    "type": "R",
+    "name": "getElementById",
+    "line": 16,
+    "column": 10,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.getElementById(\"id-a\");"
+  },
+  {
+    "type": "R",
+    "line": 16,
+    "column": 26,
+    "name": "id-a",
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.getElementById(\"id-a\");"
+  },
+  {
+    "type": "R",
+    "name": "document",
+    "line": 17,
+    "column": 1,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.getElementsByClassName(\"class-a class-b\");"
+  },
+  {
+    "type": "R",
+    "name": "getElementsByClassName",
+    "line": 17,
+    "column": 10,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.getElementsByClassName(\"class-a class-b\");"
+  },
+  {
+    "type": "R",
+    "line": 17,
+    "column": 34,
+    "name": "class-a",
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.getElementsByClassName(\"class-a class-b\");"
+  },
+  {
+    "type": "R",
+    "line": 17,
+    "column": 42,
+    "name": "class-b",
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.getElementsByClassName(\"class-a class-b\");"
+  },
+  {
+    "type": "R",
+    "name": "document",
+    "line": 18,
+    "column": 1,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.getElementsByName(\"name-a\");"
+  },
+  {
+    "type": "R",
+    "name": "getElementsByName",
+    "line": 18,
+    "column": 10,
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.getElementsByName(\"name-a\");"
+  },
+  {
+    "type": "R",
+    "line": 18,
+    "column": 29,
+    "name": "name-a",
+    "path": "./test/samples/024.QuerySelector.js",
+    "ref": "document.getElementsByName(\"name-a\");"
+  }
+]

@@ -1,1 +1,0 @@
-D,func,test/004.ArrowFunctionExpression.js,2:7,const func = param => "body";

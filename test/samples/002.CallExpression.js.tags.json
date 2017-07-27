@@ -1,0 +1,16 @@
+[
+  {
+    "type":"D",
+    "name":"fs",
+    "line":2,
+    "column":7,
+    "ref":"const fs = require('fs');"
+  },
+  {
+    "type":"R",
+    "name":"require",
+    "line":2,
+    "column":12,
+    "ref":"const fs = require('fs');"
+  }
+]

@@ -1,0 +1,34 @@
+[
+  {
+    "type": "D",
+    "name": "sourceFiles",
+    "line": 2,
+    "column": 7,
+    "path": "./test/samples/003.MemberExpression.js",
+    "ref": "const sourceFiles = process.argv.slice(2);"
+  },
+  {
+    "type": "R",
+    "name": "process",
+    "line": 2,
+    "column": 21,
+    "path": "./test/samples/003.MemberExpression.js",
+    "ref": "const sourceFiles = process.argv.slice(2);"
+  },
+  {
+    "type": "R",
+    "name": "argv",
+    "line": 2,
+    "column": 29,
+    "path": "./test/samples/003.MemberExpression.js",
+    "ref": "const sourceFiles = process.argv.slice(2);"
+  },
+  {
+    "type": "R",
+    "name": "slice",
+    "line": 2,
+    "column": 34,
+    "path": "./test/samples/003.MemberExpression.js",
+    "ref": "const sourceFiles = process.argv.slice(2);"
+  }
+]
