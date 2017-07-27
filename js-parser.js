@@ -232,6 +232,7 @@ function determineTagType(aIdNode) {
     case 'AssignmentExpression.left':       // This is just assignment
     case 'AssignmentPattern.left':
     case 'CatchClause.param':
+    case 'ClassExpression.id':
     case 'ExportSpecifier.local':
     case 'ForInStatement.left':
     case 'ForOfStatement.left':             // 'b' of 'for (b of buffer)'

@@ -1,0 +1,18 @@
+[
+  {
+    "type": "D",
+    "name": "Foo",
+    "line": 4,
+    "column": 7,
+    "path": "./test/samples/025.ClassExpression.js",
+    "ref": "class Foo {}"
+  },
+  {
+    "type": "D",
+    "name": "c",
+    "line": 5,
+    "column": 5,
+    "path": "./test/samples/025.ClassExpression.js",
+    "ref": "var c = class Bar {};"
+  }
+]
