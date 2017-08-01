@@ -171,7 +171,8 @@ function determineTagType(aIdNode) {
       if (ancestorNode && prop === 'left') return NOTHING;
       [ ancestorNode, prop ] = aIdNode.getAncestor('ForStatement');
       if (ancestorNode && prop === 'init') return NOTHING;
-      return DEF;
+
+      return isVarAssignedFromRequire(parentNode) ? REF : DEF;
     }
     case 'BinaryExpression.left':
     case 'BinaryExpression.right':
@@ -445,4 +446,21 @@ function* tagInfoFromLiteral(aLiteralNode, isSelector = false) {
       }};
     }
   }
+}
+
+const path = require('path');
+const assert = require('assert');
+
+function isVarAssignedFromRequire(aNode) {
+  assert.strictEqual(aNode.type, 'VariableDeclarator');
+
+  const {init, id: {name: varName}} = aNode;
+  if (init && init.type === 'CallExpression') {
+    const {callee: {type, name}, arguments:[{type: argType, value}]} = init;
+    return type === 'Identifier' &&
+      name === 'require' &&
+      argType === 'Literal' &&
+      varName.toLowerCase() === path.basename(value).toLowerCase();
+  }
+  return false;
 }
