@@ -1,6 +1,6 @@
 'use strict';
 
-/* eslint no-unused-vars: false */
+/* eslint no-unused-vars: off */
 const v = 'val';
 function foo(a = v) { }
 function bar(a = undefined) { }

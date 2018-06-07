@@ -1,0 +1,18 @@
+[
+  {
+    "type": "D",
+    "name": "foo",
+    "line": 4,
+    "column": 7,
+    "path": "test/samples/027.AssignmentFromImmediateFunction.js",
+    "ref": "const foo = (function FOO() { return 'bar'; })();"
+  },
+  {
+    "type": "D",
+    "name": "FOO",
+    "line": 4,
+    "column": 23,
+    "path": "test/samples/027.AssignmentFromImmediateFunction.js",
+    "ref": "const foo = (function FOO() { return 'bar'; })();"
+  }
+]
