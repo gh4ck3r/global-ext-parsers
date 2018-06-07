@@ -1,6 +1,6 @@
 {
   "name": "gtags-parsers",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "External parser for customized GNU global source tagging system",
   "main": "js-parser.js",
   "bin": {
